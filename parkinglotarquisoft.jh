@@ -2,6 +2,7 @@
 application {
   config {
     baseName gateway,
+    reactive true,
     applicationType gateway,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -220,4 +221,14 @@ relationship ManyToOne {
   Ticket{parkingSpotId required} to ParkingSpot,
 }
 
+deployment {
+  deploymentType docker-compose
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
 
+deployment {
+  deploymentType kubernetes
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
