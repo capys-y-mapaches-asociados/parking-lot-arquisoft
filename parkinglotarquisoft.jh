@@ -2,6 +2,7 @@
 application {
   config {
     baseName gateway,
+    reactive true,
     applicationType gateway,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -109,7 +110,7 @@ enum ParkingSpotVehicle {
 
 entity ParkingLot {
   name String required unique, 
-  location String required min(12), 
+  location String required minlength(12), 
   capacity Integer required max(13000)
 }
 
@@ -145,7 +146,7 @@ entity Customer {
 
 entity Notification {
   reservationId UUID required, 
-  message String max(1000), 
+  message String maxlength(1000), 
   sentAt Instant required, 
   recipientId UUID required
 }
@@ -195,15 +196,11 @@ enum PaymentMethod {
 }
 
 entity Payment {
-  customerId UUID required, 
+  customerId UUID required,
+  reservationID UUID unique,
   amount Float required max(1000.00), 
   paymentStatus PaymentStatus required, 
   paymentMethod PaymentMethod required
-}
-
-relationship OneToOne {
-  Payment{reservationId} to Reservation
-  Payment{customerId} to Customer
 }
 
 relationship OneToMany {
@@ -220,4 +217,14 @@ relationship ManyToOne {
   Ticket{parkingSpotId required} to ParkingSpot,
 }
 
+deployment {
+  deploymentType docker-compose
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
 
+deployment {
+  deploymentType kubernetes
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
