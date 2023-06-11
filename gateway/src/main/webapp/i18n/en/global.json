@@ -7,14 +7,6 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entities",
-        "barrier": "Barrier",
-        "parkingLot": "Parking Lot",
-        "payment": "Payment",
-        "parkingSpot": "Parking Spot",
-        "reservation": "Reservation",
-        "notification": "Notification",
-        "customer": "Customer",
-        "ticket": "Ticket",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

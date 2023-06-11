@@ -1,18 +1,13 @@
 {
   "generator-jhipster": {
-    "appsFolders": [
-      "gateway",
-      "parking",
-      "reservations",
-      "admissions",
-      "payments"
-    ],
-    "directoryPath": "../",
-    "gatewayType": "SpringCloudGateway",
+    "appsFolders": ["gateway", "parking", "reservations", "payments"],
     "clusteredDbApps": [],
-    "monitoring": "no",
-    "serviceDiscoveryType": "eureka",
     "deploymentType": "docker-compose",
-    "dockerRepositoryName": "zacwastaken"
+    "directoryPath": "../",
+    "dockerRepositoryName": "zacwastaken",
+    "gatewayType": "SpringCloudGateway",
+    "jwtSecretKey": "MTkwZGMyN2FiYmYyYTM3Mzg3ODg4NTJjYzRiNmM0ZGRmZGU2ODJmOWU4NDY0NDAyODFiNGEzYTZlYTBmMzkyZGM1OWYxZGYxYzQzOTRiOTIxYjY3ZGM5OWRmZWQxMjk0ZWEwYg==",
+    "monitoring": "no",
+    "serviceDiscoveryType": "eureka"
   }
 }
