@@ -196,8 +196,6 @@ relationship OneToMany {
 }
 
 relationship ManyToOne {
-  ParkingSpot{parkingLotId required} to ParkingLot{parkingSpots required},
-  Reservation{customerId required} to Customer{reservations},
   Barrier{parkingLot required} to ParkingLot {barriers required},
   Ticket{parkingSpotId required} to ParkingSpot,
 }
