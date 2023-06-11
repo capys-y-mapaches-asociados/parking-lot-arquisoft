@@ -1,9 +1,0 @@
-{
-  "gatewayApp": {
-    "BarrierType": {
-      "null": "",
-      "ENTRY": "ENTRY",
-      "EXIT": "EXIT"
-    }
-  }
-}
