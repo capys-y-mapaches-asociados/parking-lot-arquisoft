@@ -1,0 +1,120 @@
+<div>
+  <h2 id="page-heading" data-cy="ParkingSpotHeading">
+    <span jhiTranslate="gatewayApp.parkingSpot.home.title">Parking Spots</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="gatewayApp.parkingSpot.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-parking-spot"
+        [routerLink]="['/parking-spot/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="gatewayApp.parkingSpot.home.createLabel"> Create a new Parking Spot </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="parkingSpots?.length === 0">
+    <span jhiTranslate="gatewayApp.parkingSpot.home.notFound">No Parking Spots found</span>
+  </div>
+
+  <div class="table-responsive table-entities" id="entities" *ngIf="parkingSpots && parkingSpots.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+          <th scope="col" jhiSortBy="id">
+            <div class="d-flex">
+              <span jhiTranslate="global.field.id">ID</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="number">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.parkingSpot.number">Number</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="status">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.parkingSpot.status">Status</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="spotType">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.parkingSpot.spotType">Spot Type</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="spotVehicle">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.parkingSpot.spotVehicle">Spot Vehicle</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="parkingLotId.id">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.parkingSpot.parkingLotId">Parking Lot Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let parkingSpot of parkingSpots; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/parking-spot', parkingSpot.id, 'view']">{{ parkingSpot.id }}</a>
+          </td>
+          <td>{{ parkingSpot.number }}</td>
+          <td jhiTranslate="{{ 'gatewayApp.ParkingSpotStatus.' + parkingSpot.status }}">{{ parkingSpot.status }}</td>
+          <td jhiTranslate="{{ 'gatewayApp.ParkingSpotType.' + parkingSpot.spotType }}">{{ parkingSpot.spotType }}</td>
+          <td jhiTranslate="{{ 'gatewayApp.ParkingSpotVehicle.' + parkingSpot.spotVehicle }}">{{ parkingSpot.spotVehicle }}</td>
+          <td>
+            <div *ngIf="parkingSpot.parkingLotId">
+              <a [routerLink]="['/parking-lot', parkingSpot.parkingLotId.id, 'view']">{{ parkingSpot.parkingLotId.id }}</a>
+            </div>
+          </td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/parking-spot', parkingSpot.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/parking-spot', parkingSpot.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(parkingSpot)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

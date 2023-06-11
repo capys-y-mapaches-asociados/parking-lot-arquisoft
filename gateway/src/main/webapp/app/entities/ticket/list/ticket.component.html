@@ -1,0 +1,117 @@
+<div>
+  <h2 id="page-heading" data-cy="TicketHeading">
+    <span jhiTranslate="gatewayApp.ticket.home.title">Tickets</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="gatewayApp.ticket.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-ticket"
+        [routerLink]="['/ticket/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="gatewayApp.ticket.home.createLabel"> Create a new Ticket </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="tickets?.length === 0">
+    <span jhiTranslate="gatewayApp.ticket.home.notFound">No Tickets found</span>
+  </div>
+
+  <div class="table-responsive table-entities" id="entities" *ngIf="tickets && tickets.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="navigateToWithComponentValues()">
+          <th scope="col" jhiSortBy="id">
+            <div class="d-flex">
+              <span jhiTranslate="global.field.id">ID</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="ticketCode">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.ticketCode">Ticket Code</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="issuedAt">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.issuedAt">Issued At</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="entryTime">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.entryTime">Entry Time</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="exitTime">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.exitTime">Exit Time</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="status">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.status">Status</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col" jhiSortBy="parkingSpotId.id">
+            <div class="d-flex">
+              <span jhiTranslate="gatewayApp.ticket.parkingSpotId">Parking Spot Id</span>
+              <fa-icon class="p-1" icon="sort"></fa-icon>
+            </div>
+          </th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ticket of tickets; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/ticket', ticket.id, 'view']">{{ ticket.id }}</a>
+          </td>
+          <td>{{ ticket.ticketCode }}</td>
+          <td>{{ ticket.issuedAt | formatMediumDatetime }}</td>
+          <td>{{ ticket.entryTime | formatMediumDatetime }}</td>
+          <td>{{ ticket.exitTime | formatMediumDatetime }}</td>
+          <td jhiTranslate="{{ 'gatewayApp.TicketStatus.' + ticket.status }}">{{ ticket.status }}</td>
+          <td>
+            <div *ngIf="ticket.parkingSpotId">
+              <a [routerLink]="['/parking-spot', ticket.parkingSpotId.id, 'view']">{{ ticket.parkingSpotId.id }}</a>
+            </div>
+          </td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button type="submit" [routerLink]="['/ticket', ticket.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button type="submit" [routerLink]="['/ticket', ticket.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(ticket)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

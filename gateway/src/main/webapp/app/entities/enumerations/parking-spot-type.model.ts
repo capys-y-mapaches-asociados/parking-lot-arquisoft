@@ -1,0 +1,11 @@
+export enum ParkingSpotType {
+  REGULAR = 'REGULAR',
+
+  HANDICAPPED = 'HANDICAPPED',
+
+  MATERNITY = 'MATERNITY',
+
+  LOADING = 'LOADING',
+
+  EMERGENCY = 'EMERGENCY',
+}

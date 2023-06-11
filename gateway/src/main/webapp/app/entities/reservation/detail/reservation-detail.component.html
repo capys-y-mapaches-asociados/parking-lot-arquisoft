@@ -1,0 +1,60 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="reservation">
+      <h2 data-cy="reservationDetailsHeading"><span jhiTranslate="gatewayApp.reservation.detail.title">Reservation</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ reservation.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.parkingSpotId">Parking Spot Id</span></dt>
+        <dd>
+          <span>{{ reservation.parkingSpotId }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.startTime">Start Time</span></dt>
+        <dd>
+          <span>{{ reservation.startTime | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.endTime">End Time</span></dt>
+        <dd>
+          <span>{{ reservation.endTime | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.status">Status</span></dt>
+        <dd>
+          <span jhiTranslate="{{ 'gatewayApp.ReservationStatus.' + reservation.status }}">{{ reservation.status }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.reservationCode">Reservation Code</span></dt>
+        <dd>
+          <span>{{ reservation.reservationCode }}</span>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.customerId">Customer Id</span></dt>
+        <dd>
+          <div *ngIf="reservation.customerId">
+            <a [routerLink]="['/customer', reservation.customerId.id, 'view']">{{ reservation.customerId.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="gatewayApp.reservation.notifications">Notifications</span></dt>
+        <dd>
+          <div *ngIf="reservation.notifications">
+            <a [routerLink]="['/notification', reservation.notifications.id, 'view']">{{ reservation.notifications.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/reservation', reservation.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>
