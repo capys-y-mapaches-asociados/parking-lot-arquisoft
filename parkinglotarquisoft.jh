@@ -122,7 +122,6 @@ enum ReservationStatus {
 }
 
 entity Reservation {
-  customerId UUID required, 
   parkingSpotId UUID required, 
   startTime Instant required, 
   endTime Instant required, 
@@ -138,7 +137,6 @@ entity Customer {
 }
 
 entity Notification {
-  reservationId UUID required, 
   message String maxlength(1000), 
   sentAt Instant required, 
   recipientId UUID required
@@ -164,7 +162,6 @@ enum BarrierStatus {
 entity Ticket {
   ticketCode String required unique pattern(/^[A-F0-9]{6, 10}$/), 
   issuedAt Instant required, 
-  parkingSpotId UUID required, 
   entryTime Instant required, 
   exitTime Instant required, 
   status TicketStatus required
