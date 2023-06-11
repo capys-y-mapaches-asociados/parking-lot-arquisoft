@@ -63,13 +63,15 @@ spec:
               value: jdbc:postgresql://payments-postgresql.default.svc.cluster.local:5432/payments
             - name: SPRING_DATASOURCE_USERNAME
               value: payments
-            - name: SPRING_DATASOURCE_PASSWORD
+            - name: SPRING_R2DBC_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: payments-postgresql
                   key: postgresql-password
             - name: SPRING_LIQUIBASE_URL
               value: jdbc:postgresql://payments-postgresql.default.svc.cluster.local:5432/payments
+            - name: SPRING_R2DBC_URL
+              value: r2dbc:postgresql://payments-postgresql.default.svc.cluster.local:5432/payments
             - name: SPRING_SLEUTH_PROPAGATION_KEYS
               value: "x-request-id,x-ot-span-context"
             - name: JAVA_OPTS
