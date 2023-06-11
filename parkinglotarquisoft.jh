@@ -2,6 +2,7 @@
 application {
   config {
     baseName gateway,
+    reactive true,
     applicationType gateway,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -11,7 +12,7 @@ application {
     searchEngine elasticsearch,
     testFrameworks [cypress],
   }
-  entities *
+  entities * 
   dto * with mapstruct
   service * with serviceImpl
 }
@@ -29,7 +30,9 @@ application {
     serverPort 8081,
     serviceDiscoveryType eureka,
   }
-  entities ParkingLot, ParkingSpot
+  entities ParkingLot, ParkingSpot, Barrier, Ticket
+  dto * with mapstruct
+  service * with serviceImpl
 }
 
 application {
@@ -50,22 +53,6 @@ application {
 
 application {
   config {
-    baseName admissions,
-    applicationType microservice,
-    packageName co.edu.icesi,
-    authenticationType oauth2,
-    prodDatabaseType postgresql,
-    devDatabaseType h2Disk,
-    buildTool maven,
-    enableHibernateCache true,
-    serverPort 8083,
-    serviceDiscoveryType eureka,
-  }
-  entities Ticket, Barrier
-}
-
-application {
-  config {
     baseName payments,
     applicationType microservice,
     packageName co.edu.icesi,
@@ -74,7 +61,7 @@ application {
     devDatabaseType h2Disk,
     buildTool maven,
     enableHibernateCache true,
-    serverPort 8084,
+    serverPort 8083,
     serviceDiscoveryType eureka,
   }
   entities Payment
@@ -109,7 +96,7 @@ enum ParkingSpotVehicle {
 
 entity ParkingLot {
   name String required unique, 
-  location String required min(12), 
+  location String required minlength(12), 
   capacity Integer required max(13000)
 }
 
@@ -145,7 +132,7 @@ entity Customer {
 
 entity Notification {
   reservationId UUID required, 
-  message String max(1000), 
+  message String maxlength(1000), 
   sentAt Instant required, 
   recipientId UUID required
 }
@@ -195,15 +182,11 @@ enum PaymentMethod {
 }
 
 entity Payment {
-  customerId UUID required, 
+  customerId UUID required,
+  reservationID UUID unique,
   amount Float required max(1000.00), 
   paymentStatus PaymentStatus required, 
   paymentMethod PaymentMethod required
-}
-
-relationship OneToOne {
-  Payment{reservationId} to Reservation
-  Payment{customerId} to Customer
 }
 
 relationship OneToMany {
@@ -215,9 +198,18 @@ relationship OneToMany {
 relationship ManyToOne {
   ParkingSpot{parkingLotId required} to ParkingLot{parkingSpots required},
   Reservation{customerId required} to Customer{reservations},
-  Reservation{parkingSpotId required} to ParkingSpot,
   Barrier{parkingLot required} to ParkingLot {barriers required},
   Ticket{parkingSpotId required} to ParkingSpot,
 }
 
+deployment {
+  deploymentType docker-compose
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
 
+deployment {
+  deploymentType kubernetes
+  appsFolders [gateway, parking, reservations, admissions, payments]
+  dockerRepositoryName "zacwastaken"
+}
