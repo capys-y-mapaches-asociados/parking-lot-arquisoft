@@ -27,11 +27,6 @@ eureka:
     service-url:
       defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
 
-management:
-  health:
-    elasticsearch:
-      enabled: false
-
 spring:
   devtools:
     restart:
@@ -54,9 +49,6 @@ spring:
     console:
       # disable spring boot built-in h2-console since we start it manually with correct configuration
       enabled: false
-  data:
-  elasticsearch:
-    uris: http://localhost:9200
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker

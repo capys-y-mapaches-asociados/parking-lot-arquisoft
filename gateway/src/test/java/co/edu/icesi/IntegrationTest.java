@@ -2,7 +2,6 @@ package co.edu.icesi;
 
 import co.edu.icesi.GatewayApp;
 import co.edu.icesi.config.AsyncSyncConfiguration;
-import co.edu.icesi.config.EmbeddedElasticsearch;
 import co.edu.icesi.config.EmbeddedSQL;
 import co.edu.icesi.config.TestSecurityConfiguration;
 import java.lang.annotation.ElementType;
@@ -18,7 +17,6 @@ import org.springframework.test.annotation.DirtiesContext;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(classes = { GatewayApp.class, AsyncSyncConfiguration.class, TestSecurityConfiguration.class })
-@EmbeddedElasticsearch
 @EmbeddedSQL
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public @interface IntegrationTest {

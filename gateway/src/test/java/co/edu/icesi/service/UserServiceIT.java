@@ -1,17 +1,11 @@
 package co.edu.icesi.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.config.Constants;
 import co.edu.icesi.domain.User;
 import co.edu.icesi.repository.UserRepository;
-import co.edu.icesi.repository.search.UserSearchRepository;
 import co.edu.icesi.security.AuthoritiesConstants;
 import co.edu.icesi.service.dto.AdminUserDTO;
 import java.time.ZoneOffset;
@@ -23,7 +17,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,7 +24,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for {@link UserService}.
@@ -56,14 +48,6 @@ class UserServiceIT {
 
     @Autowired
     private UserService userService;
-
-    /**
-     * This repository is mocked in the co.edu.icesi.repository.search test package.
-     *
-     * @see co.edu.icesi.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @SpyBean
-    private UserSearchRepository spiedUserSearchRepository;
 
     private User user;
 

@@ -19,7 +19,6 @@ import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.
