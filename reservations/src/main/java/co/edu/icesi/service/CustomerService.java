@@ -2,7 +2,8 @@ package co.edu.icesi.service;
 
 import co.edu.icesi.service.dto.CustomerDTO;
 import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Interface for managing {@link co.edu.icesi.domain.Customer}.
@@ -14,7 +15,7 @@ public interface CustomerService {
      * @param customerDTO the entity to save.
      * @return the persisted entity.
      */
-    CustomerDTO save(CustomerDTO customerDTO);
+    Mono<CustomerDTO> save(CustomerDTO customerDTO);
 
     /**
      * Updates a customer.
@@ -22,7 +23,7 @@ public interface CustomerService {
      * @param customerDTO the entity to update.
      * @return the persisted entity.
      */
-    CustomerDTO update(CustomerDTO customerDTO);
+    Mono<CustomerDTO> update(CustomerDTO customerDTO);
 
     /**
      * Partially updates a customer.
@@ -30,14 +31,21 @@ public interface CustomerService {
      * @param customerDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<CustomerDTO> partialUpdate(CustomerDTO customerDTO);
+    Mono<CustomerDTO> partialUpdate(CustomerDTO customerDTO);
 
     /**
      * Get all the customers.
      *
      * @return the list of entities.
      */
-    List<CustomerDTO> findAll();
+    Flux<CustomerDTO> findAll();
+
+    /**
+     * Returns the number of customers available.
+     * @return the number of entities in the database.
+     *
+     */
+    Mono<Long> countAll();
 
     /**
      * Get the "id" customer.
@@ -45,12 +53,13 @@ public interface CustomerService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<CustomerDTO> findOne(Long id);
+    Mono<CustomerDTO> findOne(Long id);
 
     /**
      * Delete the "id" customer.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    void delete(Long id);
+    Mono<Void> delete(Long id);
 }

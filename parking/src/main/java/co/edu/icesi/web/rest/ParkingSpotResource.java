@@ -14,10 +14,15 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
  * REST controller for managing {@link co.edu.icesi.domain.ParkingSpot}.
@@ -50,16 +55,24 @@ public class ParkingSpotResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/parking-spots")
-    public ResponseEntity<ParkingSpotDTO> createParkingSpot(@Valid @RequestBody ParkingSpotDTO parkingSpotDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<ParkingSpotDTO>> createParkingSpot(@Valid @RequestBody ParkingSpotDTO parkingSpotDTO)
+        throws URISyntaxException {
         log.debug("REST request to save ParkingSpot : {}", parkingSpotDTO);
         if (parkingSpotDTO.getId() != null) {
             throw new BadRequestAlertException("A new parkingSpot cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ParkingSpotDTO result = parkingSpotService.save(parkingSpotDTO);
-        return ResponseEntity
-            .created(new URI("/api/parking-spots/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return parkingSpotService
+            .save(parkingSpotDTO)
+            .map(result -> {
+                try {
+                    return ResponseEntity
+                        .created(new URI("/api/parking-spots/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     /**
@@ -73,7 +86,7 @@ public class ParkingSpotResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/parking-spots/{id}")
-    public ResponseEntity<ParkingSpotDTO> updateParkingSpot(
+    public Mono<ResponseEntity<ParkingSpotDTO>> updateParkingSpot(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ParkingSpotDTO parkingSpotDTO
     ) throws URISyntaxException {
@@ -85,15 +98,23 @@ public class ParkingSpotResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!parkingSpotRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return parkingSpotRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        ParkingSpotDTO result = parkingSpotService.update(parkingSpotDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, parkingSpotDTO.getId().toString()))
-            .body(result);
+                return parkingSpotService
+                    .update(parkingSpotDTO)
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(result ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result)
+                    );
+            });
     }
 
     /**
@@ -108,7 +129,7 @@ public class ParkingSpotResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/parking-spots/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ParkingSpotDTO> partialUpdateParkingSpot(
+    public Mono<ResponseEntity<ParkingSpotDTO>> partialUpdateParkingSpot(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ParkingSpotDTO parkingSpotDTO
     ) throws URISyntaxException {
@@ -120,16 +141,24 @@ public class ParkingSpotResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!parkingSpotRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return parkingSpotRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        Optional<ParkingSpotDTO> result = parkingSpotService.partialUpdate(parkingSpotDTO);
+                Mono<ParkingSpotDTO> result = parkingSpotService.partialUpdate(parkingSpotDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, parkingSpotDTO.getId().toString())
-        );
+                return result
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(res ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                            .body(res)
+                    );
+            });
     }
 
     /**
@@ -138,8 +167,18 @@ public class ParkingSpotResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of parkingSpots in body.
      */
     @GetMapping("/parking-spots")
-    public List<ParkingSpotDTO> getAllParkingSpots() {
+    public Mono<List<ParkingSpotDTO>> getAllParkingSpots() {
         log.debug("REST request to get all ParkingSpots");
+        return parkingSpotService.findAll().collectList();
+    }
+
+    /**
+     * {@code GET  /parking-spots} : get all the parkingSpots as a stream.
+     * @return the {@link Flux} of parkingSpots.
+     */
+    @GetMapping(value = "/parking-spots", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ParkingSpotDTO> getAllParkingSpotsAsStream() {
+        log.debug("REST request to get all ParkingSpots as a stream");
         return parkingSpotService.findAll();
     }
 
@@ -150,9 +189,9 @@ public class ParkingSpotResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the parkingSpotDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/parking-spots/{id}")
-    public ResponseEntity<ParkingSpotDTO> getParkingSpot(@PathVariable Long id) {
+    public Mono<ResponseEntity<ParkingSpotDTO>> getParkingSpot(@PathVariable Long id) {
         log.debug("REST request to get ParkingSpot : {}", id);
-        Optional<ParkingSpotDTO> parkingSpotDTO = parkingSpotService.findOne(id);
+        Mono<ParkingSpotDTO> parkingSpotDTO = parkingSpotService.findOne(id);
         return ResponseUtil.wrapOrNotFound(parkingSpotDTO);
     }
 
@@ -163,12 +202,17 @@ public class ParkingSpotResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/parking-spots/{id}")
-    public ResponseEntity<Void> deleteParkingSpot(@PathVariable Long id) {
+    public Mono<ResponseEntity<Void>> deleteParkingSpot(@PathVariable Long id) {
         log.debug("REST request to delete ParkingSpot : {}", id);
-        parkingSpotService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return parkingSpotService
+            .delete(id)
+            .then(
+                Mono.just(
+                    ResponseEntity
+                        .noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
+                )
+            );
     }
 }

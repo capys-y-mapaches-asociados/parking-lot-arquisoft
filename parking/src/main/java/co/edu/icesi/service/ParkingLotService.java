@@ -2,7 +2,8 @@ package co.edu.icesi.service;
 
 import co.edu.icesi.service.dto.ParkingLotDTO;
 import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Interface for managing {@link co.edu.icesi.domain.ParkingLot}.
@@ -14,7 +15,7 @@ public interface ParkingLotService {
      * @param parkingLotDTO the entity to save.
      * @return the persisted entity.
      */
-    ParkingLotDTO save(ParkingLotDTO parkingLotDTO);
+    Mono<ParkingLotDTO> save(ParkingLotDTO parkingLotDTO);
 
     /**
      * Updates a parkingLot.
@@ -22,7 +23,7 @@ public interface ParkingLotService {
      * @param parkingLotDTO the entity to update.
      * @return the persisted entity.
      */
-    ParkingLotDTO update(ParkingLotDTO parkingLotDTO);
+    Mono<ParkingLotDTO> update(ParkingLotDTO parkingLotDTO);
 
     /**
      * Partially updates a parkingLot.
@@ -30,14 +31,21 @@ public interface ParkingLotService {
      * @param parkingLotDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<ParkingLotDTO> partialUpdate(ParkingLotDTO parkingLotDTO);
+    Mono<ParkingLotDTO> partialUpdate(ParkingLotDTO parkingLotDTO);
 
     /**
      * Get all the parkingLots.
      *
      * @return the list of entities.
      */
-    List<ParkingLotDTO> findAll();
+    Flux<ParkingLotDTO> findAll();
+
+    /**
+     * Returns the number of parkingLots available.
+     * @return the number of entities in the database.
+     *
+     */
+    Mono<Long> countAll();
 
     /**
      * Get the "id" parkingLot.
@@ -45,12 +53,13 @@ public interface ParkingLotService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<ParkingLotDTO> findOne(Long id);
+    Mono<ParkingLotDTO> findOne(Long id);
 
     /**
      * Delete the "id" parkingLot.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    void delete(Long id);
+    Mono<Void> delete(Long id);
 }

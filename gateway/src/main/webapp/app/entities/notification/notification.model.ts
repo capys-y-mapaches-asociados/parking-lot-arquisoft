@@ -2,7 +2,6 @@ import dayjs from 'dayjs/esm';
 
 export interface INotification {
   id: number;
-  reservationId?: string | null;
   message?: string | null;
   sentAt?: dayjs.Dayjs | null;
   recipientId?: string | null;

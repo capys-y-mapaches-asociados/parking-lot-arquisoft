@@ -31,7 +31,6 @@ type NotificationFormDefaults = Pick<NewNotification, 'id' | 'sentAt'>;
 
 type NotificationFormGroupContent = {
   id: FormControl<NotificationFormRawValue['id'] | NewNotification['id']>;
-  reservationId: FormControl<NotificationFormRawValue['reservationId']>;
   message: FormControl<NotificationFormRawValue['message']>;
   sentAt: FormControl<NotificationFormRawValue['sentAt']>;
   recipientId: FormControl<NotificationFormRawValue['recipientId']>;
@@ -54,9 +53,6 @@ export class NotificationFormService {
           validators: [Validators.required],
         }
       ),
-      reservationId: new FormControl(notificationRawValue.reservationId, {
-        validators: [Validators.required],
-      }),
       message: new FormControl(notificationRawValue.message, {
         validators: [Validators.maxLength(1000)],
       }),

@@ -11,16 +11,13 @@
     -->
     <changeSet id="20230611005250-1" author="jhipster">
         <createTable tableName="ticket">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="ticket_code" type="varchar(255)">
                 <constraints nullable="false" unique="true" uniqueConstraintName="ux_ticket__ticket_code" />
             </column>
             <column name="issued_at" type="${datetimeType}">
-                <constraints nullable="false" />
-            </column>
-            <column name="parking_spot_id" type="${uuidType}">
                 <constraints nullable="false" />
             </column>
             <column name="entry_time" type="${datetimeType}">
@@ -61,7 +58,6 @@
             <column name="id" type="numeric"/>
             <column name="ticket_code" type="string"/>
             <column name="issued_at" type="date"/>
-            <column name="parking_spot_id" type="${uuidType}"/>
             <column name="entry_time" type="date"/>
             <column name="exit_time" type="date"/>
             <column name="status" type="string"/>

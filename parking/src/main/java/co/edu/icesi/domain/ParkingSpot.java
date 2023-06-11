@@ -5,52 +5,48 @@ import co.edu.icesi.domain.enumeration.ParkingSpotType;
 import co.edu.icesi.domain.enumeration.ParkingSpotVehicle;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A ParkingSpot.
  */
-@Entity
-@Table(name = "parking_spot")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("parking_spot")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ParkingSpot implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Max(value = 13000)
-    @Column(name = "number", nullable = false)
+    @Column("number")
     private Integer number;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("status")
     private ParkingSpotStatus status;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "spot_type", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("spot_type")
     private ParkingSpotType spotType;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "spot_vehicle", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("spot_vehicle")
     private ParkingSpotVehicle spotVehicle;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @Transient
     @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLotId;
+
+    @Column("parking_lot_id_id")
+    private Long parkingLotIdId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -125,11 +121,20 @@ public class ParkingSpot implements Serializable {
 
     public void setParkingLotId(ParkingLot parkingLot) {
         this.parkingLotId = parkingLot;
+        this.parkingLotIdId = parkingLot != null ? parkingLot.getId() : null;
     }
 
     public ParkingSpot parkingLotId(ParkingLot parkingLot) {
         this.setParkingLotId(parkingLot);
         return this;
+    }
+
+    public Long getParkingLotIdId() {
+        return this.parkingLotIdId;
+    }
+
+    public void setParkingLotIdId(Long parkingLot) {
+        this.parkingLotIdId = parkingLot;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -14,10 +14,15 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
  * REST controller for managing {@link co.edu.icesi.domain.Reservation}.
@@ -50,16 +55,24 @@ public class ReservationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationDTO> createReservation(@Valid @RequestBody ReservationDTO reservationDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<ReservationDTO>> createReservation(@Valid @RequestBody ReservationDTO reservationDTO)
+        throws URISyntaxException {
         log.debug("REST request to save Reservation : {}", reservationDTO);
         if (reservationDTO.getId() != null) {
             throw new BadRequestAlertException("A new reservation cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ReservationDTO result = reservationService.save(reservationDTO);
-        return ResponseEntity
-            .created(new URI("/api/reservations/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return reservationService
+            .save(reservationDTO)
+            .map(result -> {
+                try {
+                    return ResponseEntity
+                        .created(new URI("/api/reservations/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     /**
@@ -73,7 +86,7 @@ public class ReservationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/reservations/{id}")
-    public ResponseEntity<ReservationDTO> updateReservation(
+    public Mono<ResponseEntity<ReservationDTO>> updateReservation(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ReservationDTO reservationDTO
     ) throws URISyntaxException {
@@ -85,15 +98,23 @@ public class ReservationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!reservationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return reservationRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        ReservationDTO result = reservationService.update(reservationDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, reservationDTO.getId().toString()))
-            .body(result);
+                return reservationService
+                    .update(reservationDTO)
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(result ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result)
+                    );
+            });
     }
 
     /**
@@ -108,7 +129,7 @@ public class ReservationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/reservations/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ReservationDTO> partialUpdateReservation(
+    public Mono<ResponseEntity<ReservationDTO>> partialUpdateReservation(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ReservationDTO reservationDTO
     ) throws URISyntaxException {
@@ -120,16 +141,24 @@ public class ReservationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!reservationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return reservationRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        Optional<ReservationDTO> result = reservationService.partialUpdate(reservationDTO);
+                Mono<ReservationDTO> result = reservationService.partialUpdate(reservationDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, reservationDTO.getId().toString())
-        );
+                return result
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(res ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                            .body(res)
+                    );
+            });
     }
 
     /**
@@ -138,8 +167,18 @@ public class ReservationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of reservations in body.
      */
     @GetMapping("/reservations")
-    public List<ReservationDTO> getAllReservations() {
+    public Mono<List<ReservationDTO>> getAllReservations() {
         log.debug("REST request to get all Reservations");
+        return reservationService.findAll().collectList();
+    }
+
+    /**
+     * {@code GET  /reservations} : get all the reservations as a stream.
+     * @return the {@link Flux} of reservations.
+     */
+    @GetMapping(value = "/reservations", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ReservationDTO> getAllReservationsAsStream() {
+        log.debug("REST request to get all Reservations as a stream");
         return reservationService.findAll();
     }
 
@@ -150,9 +189,9 @@ public class ReservationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the reservationDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/reservations/{id}")
-    public ResponseEntity<ReservationDTO> getReservation(@PathVariable Long id) {
+    public Mono<ResponseEntity<ReservationDTO>> getReservation(@PathVariable Long id) {
         log.debug("REST request to get Reservation : {}", id);
-        Optional<ReservationDTO> reservationDTO = reservationService.findOne(id);
+        Mono<ReservationDTO> reservationDTO = reservationService.findOne(id);
         return ResponseUtil.wrapOrNotFound(reservationDTO);
     }
 
@@ -163,12 +202,17 @@ public class ReservationResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+    public Mono<ResponseEntity<Void>> deleteReservation(@PathVariable Long id) {
         log.debug("REST request to delete Reservation : {}", id);
-        reservationService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return reservationService
+            .delete(id)
+            .then(
+                Mono.just(
+                    ResponseEntity
+                        .noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
+                )
+            );
     }
 }

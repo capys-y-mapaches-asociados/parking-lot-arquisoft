@@ -5,7 +5,6 @@ import { ReservationStatus } from 'app/entities/enumerations/reservation-status.
 
 export interface IReservation {
   id: number;
-  customerId?: string | null;
   parkingSpotId?: string | null;
   startTime?: dayjs.Dayjs | null;
   endTime?: dayjs.Dayjs | null;

@@ -2,35 +2,35 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.Barrier;
 import co.edu.icesi.domain.ParkingLot;
 import co.edu.icesi.domain.ParkingSpot;
+import co.edu.icesi.repository.EntityManager;
 import co.edu.icesi.repository.ParkingLotRepository;
 import co.edu.icesi.service.dto.ParkingLotDTO;
 import co.edu.icesi.service.mapper.ParkingLotMapper;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * Integration tests for the {@link ParkingLotResource} REST controller.
  */
 @IntegrationTest
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_ENTITY_TIMEOUT)
 @WithMockUser
 class ParkingLotResourceIT {
 
@@ -59,7 +59,7 @@ class ParkingLotResourceIT {
     private EntityManager em;
 
     @Autowired
-    private MockMvc restParkingLotMockMvc;
+    private WebTestClient webTestClient;
 
     private ParkingLot parkingLot;
 
@@ -73,23 +73,11 @@ class ParkingLotResourceIT {
         ParkingLot parkingLot = new ParkingLot().name(DEFAULT_NAME).location(DEFAULT_LOCATION).capacity(DEFAULT_CAPACITY);
         // Add required entity
         ParkingSpot parkingSpot;
-        if (TestUtil.findAll(em, ParkingSpot.class).isEmpty()) {
-            parkingSpot = ParkingSpotResourceIT.createEntity(em);
-            em.persist(parkingSpot);
-            em.flush();
-        } else {
-            parkingSpot = TestUtil.findAll(em, ParkingSpot.class).get(0);
-        }
+        parkingSpot = em.insert(ParkingSpotResourceIT.createEntity(em)).block();
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
         Barrier barrier;
-        if (TestUtil.findAll(em, Barrier.class).isEmpty()) {
-            barrier = BarrierResourceIT.createEntity(em);
-            em.persist(barrier);
-            em.flush();
-        } else {
-            barrier = TestUtil.findAll(em, Barrier.class).get(0);
-        }
+        barrier = em.insert(BarrierResourceIT.createEntity(em)).block();
         parkingLot.getBarriers().add(barrier);
         return parkingLot;
     }
@@ -104,49 +92,57 @@ class ParkingLotResourceIT {
         ParkingLot parkingLot = new ParkingLot().name(UPDATED_NAME).location(UPDATED_LOCATION).capacity(UPDATED_CAPACITY);
         // Add required entity
         ParkingSpot parkingSpot;
-        if (TestUtil.findAll(em, ParkingSpot.class).isEmpty()) {
-            parkingSpot = ParkingSpotResourceIT.createUpdatedEntity(em);
-            em.persist(parkingSpot);
-            em.flush();
-        } else {
-            parkingSpot = TestUtil.findAll(em, ParkingSpot.class).get(0);
-        }
+        parkingSpot = em.insert(ParkingSpotResourceIT.createUpdatedEntity(em)).block();
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
         Barrier barrier;
-        if (TestUtil.findAll(em, Barrier.class).isEmpty()) {
-            barrier = BarrierResourceIT.createUpdatedEntity(em);
-            em.persist(barrier);
-            em.flush();
-        } else {
-            barrier = TestUtil.findAll(em, Barrier.class).get(0);
-        }
+        barrier = em.insert(BarrierResourceIT.createUpdatedEntity(em)).block();
         parkingLot.getBarriers().add(barrier);
         return parkingLot;
     }
 
+    public static void deleteEntities(EntityManager em) {
+        try {
+            em.deleteAll(ParkingLot.class).block();
+        } catch (Exception e) {
+            // It can fail, if other entities are still referring this - it will be removed later.
+        }
+        ParkingSpotResourceIT.deleteEntities(em);
+        BarrierResourceIT.deleteEntities(em);
+    }
+
+    @AfterEach
+    public void cleanup() {
+        deleteEntities(em);
+    }
+
+    @BeforeEach
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
+    }
+
     @BeforeEach
     public void initTest() {
+        deleteEntities(em);
         parkingLot = createEntity(em);
     }
 
     @Test
-    @Transactional
     void createParkingLot() throws Exception {
-        int databaseSizeBeforeCreate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeCreate = parkingLotRepository.findAll().collectList().block().size();
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
-        restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isCreated());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isCreated();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeCreate + 1);
         ParkingLot testParkingLot = parkingLotList.get(parkingLotList.size() - 1);
         assertThat(testParkingLot.getName()).isEqualTo(DEFAULT_NAME);
@@ -155,165 +151,210 @@ class ParkingLotResourceIT {
     }
 
     @Test
-    @Transactional
     void createParkingLotWithExistingId() throws Exception {
         // Create the ParkingLot with an existing ID
         parkingLot.setId(1L);
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
-        int databaseSizeBeforeCreate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeCreate = parkingLotRepository.findAll().collectList().block().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeCreate);
     }
 
     @Test
-    @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeTest = parkingLotRepository.findAll().collectList().block().size();
         // set the field null
         parkingLot.setName(null);
 
         // Create the ParkingLot, which fails.
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
-        restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
     void checkLocationIsRequired() throws Exception {
-        int databaseSizeBeforeTest = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeTest = parkingLotRepository.findAll().collectList().block().size();
         // set the field null
         parkingLot.setLocation(null);
 
         // Create the ParkingLot, which fails.
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
-        restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
     void checkCapacityIsRequired() throws Exception {
-        int databaseSizeBeforeTest = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeTest = parkingLotRepository.findAll().collectList().block().size();
         // set the field null
         parkingLot.setCapacity(null);
 
         // Create the ParkingLot, which fails.
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
-        restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
-    void getAllParkingLots() throws Exception {
+    void getAllParkingLotsAsStream() {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
+
+        List<ParkingLot> parkingLotList = webTestClient
+            .get()
+            .uri(ENTITY_API_URL)
+            .accept(MediaType.APPLICATION_NDJSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_NDJSON)
+            .returnResult(ParkingLotDTO.class)
+            .getResponseBody()
+            .map(parkingLotMapper::toEntity)
+            .filter(parkingLot::equals)
+            .collectList()
+            .block(Duration.ofSeconds(5));
+
+        assertThat(parkingLotList).isNotNull();
+        assertThat(parkingLotList).hasSize(1);
+        ParkingLot testParkingLot = parkingLotList.get(0);
+        assertThat(testParkingLot.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testParkingLot.getLocation()).isEqualTo(DEFAULT_LOCATION);
+        assertThat(testParkingLot.getCapacity()).isEqualTo(DEFAULT_CAPACITY);
+    }
+
+    @Test
+    void getAllParkingLots() {
+        // Initialize the database
+        parkingLotRepository.save(parkingLot).block();
 
         // Get all the parkingLotList
-        restParkingLotMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(parkingLot.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].location").value(hasItem(DEFAULT_LOCATION)))
-            .andExpect(jsonPath("$.[*].capacity").value(hasItem(DEFAULT_CAPACITY)));
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL + "?sort=id,desc")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.[*].id")
+            .value(hasItem(parkingLot.getId().intValue()))
+            .jsonPath("$.[*].name")
+            .value(hasItem(DEFAULT_NAME))
+            .jsonPath("$.[*].location")
+            .value(hasItem(DEFAULT_LOCATION))
+            .jsonPath("$.[*].capacity")
+            .value(hasItem(DEFAULT_CAPACITY));
     }
 
     @Test
-    @Transactional
-    void getParkingLot() throws Exception {
+    void getParkingLot() {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
 
         // Get the parkingLot
-        restParkingLotMockMvc
-            .perform(get(ENTITY_API_URL_ID, parkingLot.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(parkingLot.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.location").value(DEFAULT_LOCATION))
-            .andExpect(jsonPath("$.capacity").value(DEFAULT_CAPACITY));
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL_ID, parkingLot.getId())
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.id")
+            .value(is(parkingLot.getId().intValue()))
+            .jsonPath("$.name")
+            .value(is(DEFAULT_NAME))
+            .jsonPath("$.location")
+            .value(is(DEFAULT_LOCATION))
+            .jsonPath("$.capacity")
+            .value(is(DEFAULT_CAPACITY));
     }
 
     @Test
-    @Transactional
-    void getNonExistingParkingLot() throws Exception {
+    void getNonExistingParkingLot() {
         // Get the parkingLot
-        restParkingLotMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL_ID, Long.MAX_VALUE)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
-    @Transactional
     void putExistingParkingLot() throws Exception {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
 
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
 
         // Update the parkingLot
-        ParkingLot updatedParkingLot = parkingLotRepository.findById(parkingLot.getId()).get();
-        // Disconnect from session so that the updates on updatedParkingLot are not directly saved in db
-        em.detach(updatedParkingLot);
+        ParkingLot updatedParkingLot = parkingLotRepository.findById(parkingLot.getId()).block();
         updatedParkingLot.name(UPDATED_NAME).location(UPDATED_LOCATION).capacity(UPDATED_CAPACITY);
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(updatedParkingLot);
 
-        restParkingLotMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, parkingLotDTO.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
         ParkingLot testParkingLot = parkingLotList.get(parkingLotList.size() - 1);
         assertThat(testParkingLot.getName()).isEqualTo(UPDATED_NAME);
@@ -322,84 +363,80 @@ class ParkingLotResourceIT {
     }
 
     @Test
-    @Transactional
     void putNonExistingParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, parkingLotDTO.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void putWithIdMismatchParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, count.incrementAndGet())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void putWithMissingIdPathParamParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isMethodNotAllowed());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isEqualTo(405);
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void partialUpdateParkingLotWithPatch() throws Exception {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
 
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
 
         // Update the parkingLot using partial update
         ParkingLot partialUpdatedParkingLot = new ParkingLot();
@@ -407,17 +444,17 @@ class ParkingLotResourceIT {
 
         partialUpdatedParkingLot.name(UPDATED_NAME).location(UPDATED_LOCATION);
 
-        restParkingLotMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
         ParkingLot testParkingLot = parkingLotList.get(parkingLotList.size() - 1);
         assertThat(testParkingLot.getName()).isEqualTo(UPDATED_NAME);
@@ -426,12 +463,11 @@ class ParkingLotResourceIT {
     }
 
     @Test
-    @Transactional
     void fullUpdateParkingLotWithPatch() throws Exception {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
 
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
 
         // Update the parkingLot using partial update
         ParkingLot partialUpdatedParkingLot = new ParkingLot();
@@ -439,17 +475,17 @@ class ParkingLotResourceIT {
 
         partialUpdatedParkingLot.name(UPDATED_NAME).location(UPDATED_LOCATION).capacity(UPDATED_CAPACITY);
 
-        restParkingLotMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
         ParkingLot testParkingLot = parkingLotList.get(parkingLotList.size() - 1);
         assertThat(testParkingLot.getName()).isEqualTo(UPDATED_NAME);
@@ -458,92 +494,92 @@ class ParkingLotResourceIT {
     }
 
     @Test
-    @Transactional
     void patchNonExistingParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, parkingLotDTO.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void patchWithIdMismatchParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, count.incrementAndGet())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void patchWithMissingIdPathParamParkingLot() throws Exception {
-        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeUpdate = parkingLotRepository.findAll().collectList().block().size();
         parkingLot.setId(count.incrementAndGet());
 
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restParkingLotMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
-            .andExpect(status().isMethodNotAllowed());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+            .exchange()
+            .expectStatus()
+            .isEqualTo(405);
 
         // Validate the ParkingLot in the database
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
-    void deleteParkingLot() throws Exception {
+    void deleteParkingLot() {
         // Initialize the database
-        parkingLotRepository.saveAndFlush(parkingLot);
+        parkingLotRepository.save(parkingLot).block();
 
-        int databaseSizeBeforeDelete = parkingLotRepository.findAll().size();
+        int databaseSizeBeforeDelete = parkingLotRepository.findAll().collectList().block().size();
 
         // Delete the parkingLot
-        restParkingLotMockMvc
-            .perform(delete(ENTITY_API_URL_ID, parkingLot.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+        webTestClient
+            .delete()
+            .uri(ENTITY_API_URL_ID, parkingLot.getId())
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
         // Validate the database contains one less item
-        List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
+        List<ParkingLot> parkingLotList = parkingLotRepository.findAll().collectList().block();
         assertThat(parkingLotList).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

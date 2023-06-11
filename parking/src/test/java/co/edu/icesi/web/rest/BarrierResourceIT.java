@@ -2,9 +2,8 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.Barrier;
@@ -12,26 +11,27 @@ import co.edu.icesi.domain.ParkingLot;
 import co.edu.icesi.domain.enumeration.BarrierStatus;
 import co.edu.icesi.domain.enumeration.BarrierType;
 import co.edu.icesi.repository.BarrierRepository;
+import co.edu.icesi.repository.EntityManager;
 import co.edu.icesi.service.dto.BarrierDTO;
 import co.edu.icesi.service.mapper.BarrierMapper;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * Integration tests for the {@link BarrierResource} REST controller.
  */
 @IntegrationTest
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_ENTITY_TIMEOUT)
 @WithMockUser
 class BarrierResourceIT {
 
@@ -60,7 +60,7 @@ class BarrierResourceIT {
     private EntityManager em;
 
     @Autowired
-    private MockMvc restBarrierMockMvc;
+    private WebTestClient webTestClient;
 
     private Barrier barrier;
 
@@ -74,13 +74,7 @@ class BarrierResourceIT {
         Barrier barrier = new Barrier().name(DEFAULT_NAME).type(DEFAULT_TYPE).status(DEFAULT_STATUS);
         // Add required entity
         ParkingLot parkingLot;
-        if (TestUtil.findAll(em, ParkingLot.class).isEmpty()) {
-            parkingLot = ParkingLotResourceIT.createEntity(em);
-            em.persist(parkingLot);
-            em.flush();
-        } else {
-            parkingLot = TestUtil.findAll(em, ParkingLot.class).get(0);
-        }
+        parkingLot = em.insert(ParkingLotResourceIT.createEntity(em)).block();
         barrier.setParkingLot(parkingLot);
         return barrier;
     }
@@ -95,39 +89,52 @@ class BarrierResourceIT {
         Barrier barrier = new Barrier().name(UPDATED_NAME).type(UPDATED_TYPE).status(UPDATED_STATUS);
         // Add required entity
         ParkingLot parkingLot;
-        if (TestUtil.findAll(em, ParkingLot.class).isEmpty()) {
-            parkingLot = ParkingLotResourceIT.createUpdatedEntity(em);
-            em.persist(parkingLot);
-            em.flush();
-        } else {
-            parkingLot = TestUtil.findAll(em, ParkingLot.class).get(0);
-        }
+        parkingLot = em.insert(ParkingLotResourceIT.createUpdatedEntity(em)).block();
         barrier.setParkingLot(parkingLot);
         return barrier;
     }
 
+    public static void deleteEntities(EntityManager em) {
+        try {
+            em.deleteAll(Barrier.class).block();
+        } catch (Exception e) {
+            // It can fail, if other entities are still referring this - it will be removed later.
+        }
+        ParkingLotResourceIT.deleteEntities(em);
+    }
+
+    @AfterEach
+    public void cleanup() {
+        deleteEntities(em);
+    }
+
+    @BeforeEach
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
+    }
+
     @BeforeEach
     public void initTest() {
+        deleteEntities(em);
         barrier = createEntity(em);
     }
 
     @Test
-    @Transactional
     void createBarrier() throws Exception {
-        int databaseSizeBeforeCreate = barrierRepository.findAll().size();
+        int databaseSizeBeforeCreate = barrierRepository.findAll().collectList().block().size();
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
-        restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isCreated());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isCreated();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeCreate + 1);
         Barrier testBarrier = barrierList.get(barrierList.size() - 1);
         assertThat(testBarrier.getName()).isEqualTo(DEFAULT_NAME);
@@ -136,165 +143,210 @@ class BarrierResourceIT {
     }
 
     @Test
-    @Transactional
     void createBarrierWithExistingId() throws Exception {
         // Create the Barrier with an existing ID
         barrier.setId(1L);
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
-        int databaseSizeBeforeCreate = barrierRepository.findAll().size();
+        int databaseSizeBeforeCreate = barrierRepository.findAll().collectList().block().size();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeCreate);
     }
 
     @Test
-    @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = barrierRepository.findAll().size();
+        int databaseSizeBeforeTest = barrierRepository.findAll().collectList().block().size();
         // set the field null
         barrier.setName(null);
 
         // Create the Barrier, which fails.
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
-        restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
     void checkTypeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = barrierRepository.findAll().size();
+        int databaseSizeBeforeTest = barrierRepository.findAll().collectList().block().size();
         // set the field null
         barrier.setType(null);
 
         // Create the Barrier, which fails.
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
-        restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
     void checkStatusIsRequired() throws Exception {
-        int databaseSizeBeforeTest = barrierRepository.findAll().size();
+        int databaseSizeBeforeTest = barrierRepository.findAll().collectList().block().size();
         // set the field null
         barrier.setStatus(null);
 
         // Create the Barrier, which fails.
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
-        restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
-    @Transactional
-    void getAllBarriers() throws Exception {
+    void getAllBarriersAsStream() {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
+
+        List<Barrier> barrierList = webTestClient
+            .get()
+            .uri(ENTITY_API_URL)
+            .accept(MediaType.APPLICATION_NDJSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_NDJSON)
+            .returnResult(BarrierDTO.class)
+            .getResponseBody()
+            .map(barrierMapper::toEntity)
+            .filter(barrier::equals)
+            .collectList()
+            .block(Duration.ofSeconds(5));
+
+        assertThat(barrierList).isNotNull();
+        assertThat(barrierList).hasSize(1);
+        Barrier testBarrier = barrierList.get(0);
+        assertThat(testBarrier.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testBarrier.getType()).isEqualTo(DEFAULT_TYPE);
+        assertThat(testBarrier.getStatus()).isEqualTo(DEFAULT_STATUS);
+    }
+
+    @Test
+    void getAllBarriers() {
+        // Initialize the database
+        barrierRepository.save(barrier).block();
 
         // Get all the barrierList
-        restBarrierMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(barrier.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())));
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL + "?sort=id,desc")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.[*].id")
+            .value(hasItem(barrier.getId().intValue()))
+            .jsonPath("$.[*].name")
+            .value(hasItem(DEFAULT_NAME))
+            .jsonPath("$.[*].type")
+            .value(hasItem(DEFAULT_TYPE.toString()))
+            .jsonPath("$.[*].status")
+            .value(hasItem(DEFAULT_STATUS.toString()));
     }
 
     @Test
-    @Transactional
-    void getBarrier() throws Exception {
+    void getBarrier() {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
 
         // Get the barrier
-        restBarrierMockMvc
-            .perform(get(ENTITY_API_URL_ID, barrier.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(barrier.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()));
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL_ID, barrier.getId())
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .contentType(MediaType.APPLICATION_JSON)
+            .expectBody()
+            .jsonPath("$.id")
+            .value(is(barrier.getId().intValue()))
+            .jsonPath("$.name")
+            .value(is(DEFAULT_NAME))
+            .jsonPath("$.type")
+            .value(is(DEFAULT_TYPE.toString()))
+            .jsonPath("$.status")
+            .value(is(DEFAULT_STATUS.toString()));
     }
 
     @Test
-    @Transactional
-    void getNonExistingBarrier() throws Exception {
+    void getNonExistingBarrier() {
         // Get the barrier
-        restBarrierMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+        webTestClient
+            .get()
+            .uri(ENTITY_API_URL_ID, Long.MAX_VALUE)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
-    @Transactional
     void putExistingBarrier() throws Exception {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
 
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
 
         // Update the barrier
-        Barrier updatedBarrier = barrierRepository.findById(barrier.getId()).get();
-        // Disconnect from session so that the updates on updatedBarrier are not directly saved in db
-        em.detach(updatedBarrier);
+        Barrier updatedBarrier = barrierRepository.findById(barrier.getId()).block();
         updatedBarrier.name(UPDATED_NAME).type(UPDATED_TYPE).status(UPDATED_STATUS);
         BarrierDTO barrierDTO = barrierMapper.toDto(updatedBarrier);
 
-        restBarrierMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, barrierDTO.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
         Barrier testBarrier = barrierList.get(barrierList.size() - 1);
         assertThat(testBarrier.getName()).isEqualTo(UPDATED_NAME);
@@ -303,84 +355,80 @@ class BarrierResourceIT {
     }
 
     @Test
-    @Transactional
     void putNonExistingBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, barrierDTO.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void putWithIdMismatchBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL_ID, count.incrementAndGet())
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void putWithMissingIdPathParamBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isMethodNotAllowed());
+        webTestClient
+            .put()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isEqualTo(405);
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void partialUpdateBarrierWithPatch() throws Exception {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
 
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
 
         // Update the barrier using partial update
         Barrier partialUpdatedBarrier = new Barrier();
@@ -388,17 +436,17 @@ class BarrierResourceIT {
 
         partialUpdatedBarrier.type(UPDATED_TYPE).status(UPDATED_STATUS);
 
-        restBarrierMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
         Barrier testBarrier = barrierList.get(barrierList.size() - 1);
         assertThat(testBarrier.getName()).isEqualTo(DEFAULT_NAME);
@@ -407,12 +455,11 @@ class BarrierResourceIT {
     }
 
     @Test
-    @Transactional
     void fullUpdateBarrierWithPatch() throws Exception {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
 
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
 
         // Update the barrier using partial update
         Barrier partialUpdatedBarrier = new Barrier();
@@ -420,17 +467,17 @@ class BarrierResourceIT {
 
         partialUpdatedBarrier.name(UPDATED_NAME).type(UPDATED_TYPE).status(UPDATED_STATUS);
 
-        restBarrierMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
-            )
-            .andExpect(status().isOk());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
+            .exchange()
+            .expectStatus()
+            .isOk();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
         Barrier testBarrier = barrierList.get(barrierList.size() - 1);
         assertThat(testBarrier.getName()).isEqualTo(UPDATED_NAME);
@@ -439,92 +486,92 @@ class BarrierResourceIT {
     }
 
     @Test
-    @Transactional
     void patchNonExistingBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, barrierDTO.getId())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void patchWithIdMismatchBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isBadRequest());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL_ID, count.incrementAndGet())
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
     void patchWithMissingIdPathParamBarrier() throws Exception {
-        int databaseSizeBeforeUpdate = barrierRepository.findAll().size();
+        int databaseSizeBeforeUpdate = barrierRepository.findAll().collectList().block().size();
         barrier.setId(count.incrementAndGet());
 
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restBarrierMockMvc
-            .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
-            .andExpect(status().isMethodNotAllowed());
+        webTestClient
+            .patch()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.valueOf("application/merge-patch+json"))
+            .bodyValue(TestUtil.convertObjectToJsonBytes(barrierDTO))
+            .exchange()
+            .expectStatus()
+            .isEqualTo(405);
 
         // Validate the Barrier in the database
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeUpdate);
     }
 
     @Test
-    @Transactional
-    void deleteBarrier() throws Exception {
+    void deleteBarrier() {
         // Initialize the database
-        barrierRepository.saveAndFlush(barrier);
+        barrierRepository.save(barrier).block();
 
-        int databaseSizeBeforeDelete = barrierRepository.findAll().size();
+        int databaseSizeBeforeDelete = barrierRepository.findAll().collectList().block().size();
 
         // Delete the barrier
-        restBarrierMockMvc
-            .perform(delete(ENTITY_API_URL_ID, barrier.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+        webTestClient
+            .delete()
+            .uri(ENTITY_API_URL_ID, barrier.getId())
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
         // Validate the database contains one less item
-        List<Barrier> barrierList = barrierRepository.findAll();
+        List<Barrier> barrierList = barrierRepository.findAll().collectList().block();
         assertThat(barrierList).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

@@ -14,10 +14,15 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
  * REST controller for managing {@link co.edu.icesi.domain.Notification}.
@@ -50,17 +55,24 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/notifications")
-    public ResponseEntity<NotificationDTO> createNotification(@Valid @RequestBody NotificationDTO notificationDTO)
+    public Mono<ResponseEntity<NotificationDTO>> createNotification(@Valid @RequestBody NotificationDTO notificationDTO)
         throws URISyntaxException {
         log.debug("REST request to save Notification : {}", notificationDTO);
         if (notificationDTO.getId() != null) {
             throw new BadRequestAlertException("A new notification cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        NotificationDTO result = notificationService.save(notificationDTO);
-        return ResponseEntity
-            .created(new URI("/api/notifications/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return notificationService
+            .save(notificationDTO)
+            .map(result -> {
+                try {
+                    return ResponseEntity
+                        .created(new URI("/api/notifications/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     /**
@@ -74,7 +86,7 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/notifications/{id}")
-    public ResponseEntity<NotificationDTO> updateNotification(
+    public Mono<ResponseEntity<NotificationDTO>> updateNotification(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody NotificationDTO notificationDTO
     ) throws URISyntaxException {
@@ -86,15 +98,23 @@ public class NotificationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!notificationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return notificationRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        NotificationDTO result = notificationService.update(notificationDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, notificationDTO.getId().toString()))
-            .body(result);
+                return notificationService
+                    .update(notificationDTO)
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(result ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result)
+                    );
+            });
     }
 
     /**
@@ -109,7 +129,7 @@ public class NotificationResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/notifications/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<NotificationDTO> partialUpdateNotification(
+    public Mono<ResponseEntity<NotificationDTO>> partialUpdateNotification(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody NotificationDTO notificationDTO
     ) throws URISyntaxException {
@@ -121,16 +141,24 @@ public class NotificationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!notificationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return notificationRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        Optional<NotificationDTO> result = notificationService.partialUpdate(notificationDTO);
+                Mono<NotificationDTO> result = notificationService.partialUpdate(notificationDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, notificationDTO.getId().toString())
-        );
+                return result
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(res ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                            .body(res)
+                    );
+            });
     }
 
     /**
@@ -139,8 +167,18 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of notifications in body.
      */
     @GetMapping("/notifications")
-    public List<NotificationDTO> getAllNotifications() {
+    public Mono<List<NotificationDTO>> getAllNotifications() {
         log.debug("REST request to get all Notifications");
+        return notificationService.findAll().collectList();
+    }
+
+    /**
+     * {@code GET  /notifications} : get all the notifications as a stream.
+     * @return the {@link Flux} of notifications.
+     */
+    @GetMapping(value = "/notifications", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<NotificationDTO> getAllNotificationsAsStream() {
+        log.debug("REST request to get all Notifications as a stream");
         return notificationService.findAll();
     }
 
@@ -151,9 +189,9 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the notificationDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/notifications/{id}")
-    public ResponseEntity<NotificationDTO> getNotification(@PathVariable Long id) {
+    public Mono<ResponseEntity<NotificationDTO>> getNotification(@PathVariable Long id) {
         log.debug("REST request to get Notification : {}", id);
-        Optional<NotificationDTO> notificationDTO = notificationService.findOne(id);
+        Mono<NotificationDTO> notificationDTO = notificationService.findOne(id);
         return ResponseUtil.wrapOrNotFound(notificationDTO);
     }
 
@@ -164,12 +202,17 @@ public class NotificationResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/notifications/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
+    public Mono<ResponseEntity<Void>> deleteNotification(@PathVariable Long id) {
         log.debug("REST request to delete Notification : {}", id);
-        notificationService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return notificationService
+            .delete(id)
+            .then(
+                Mono.just(
+                    ResponseEntity
+                        .noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
+                )
+            );
     }
 }

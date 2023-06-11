@@ -62,12 +62,6 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="customerId">
-            <div class="d-flex">
-              <span jhiTranslate="gatewayApp.reservation.customerId">Customer Id</span>
-              <fa-icon class="p-1" *ngIf="!currentSearch" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col" jhiSortBy="parkingSpotId">
             <div class="d-flex">
               <span jhiTranslate="gatewayApp.reservation.parkingSpotId">Parking Spot Id</span>
@@ -118,7 +112,6 @@
           <td>
             <a [routerLink]="['/reservation', reservation.id, 'view']">{{ reservation.id }}</a>
           </td>
-          <td>{{ reservation.customerId }}</td>
           <td>{{ reservation.parkingSpotId }}</td>
           <td>{{ reservation.startTime | formatMediumDatetime }}</td>
           <td>{{ reservation.endTime | formatMediumDatetime }}</td>

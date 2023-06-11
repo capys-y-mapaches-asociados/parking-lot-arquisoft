@@ -7,11 +7,6 @@
   "entityTableName": "reservation",
   "fields": [
     {
-      "fieldName": "customerId",
-      "fieldType": "UUID",
-      "fieldValidateRules": ["required"]
-    },
-    {
       "fieldName": "parkingSpotId",
       "fieldType": "UUID",
       "fieldValidateRules": ["required"]

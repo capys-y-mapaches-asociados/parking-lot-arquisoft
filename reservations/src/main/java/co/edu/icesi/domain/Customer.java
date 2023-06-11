@@ -4,48 +4,44 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Customer.
  */
-@Entity
-@Table(name = "customer")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("customer")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "first_name", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("first_name")
     private String firstName;
 
-    @NotNull
-    @Column(name = "last_name", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("last_name")
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
-    @Column(name = "email", nullable = false)
+    @Column("email")
     private String email;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[a-fA-F0-9]{64}$")
-    @Column(name = "password", nullable = false)
+    @Column("password")
     private String password;
 
-    @OneToMany(mappedBy = "customerId")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Transient
     @JsonIgnoreProperties(value = { "customerId", "notifications" }, allowSetters = true)
     private Set<Reservation> reservations = new HashSet<>();
 

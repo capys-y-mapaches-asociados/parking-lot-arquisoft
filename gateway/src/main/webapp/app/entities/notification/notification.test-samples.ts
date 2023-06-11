@@ -4,30 +4,27 @@ import { INotification, NewNotification } from './notification.model';
 
 export const sampleWithRequiredData: INotification = {
   id: 30621,
-  reservationId: '05a8ca40-7022-4832-8605-5c933ab5156a',
-  sentAt: dayjs('2023-06-10T06:48'),
-  recipientId: '838c2eea-45d2-4b9f-a237-351489256ff4',
+  sentAt: dayjs('2023-06-11T00:30'),
+  recipientId: '5a8ca407-0228-4328-a055-c933ab5156ac',
 };
 
 export const sampleWithPartialData: INotification = {
-  id: 89089,
-  reservationId: 'a7003767-1fbf-4f26-81ed-e53a9ac5af03',
-  sentAt: dayjs('2023-06-10T05:20'),
-  recipientId: 'b908a2b2-3602-4b58-8411-94145e42bf5b',
+  id: 23094,
+  message: 'digital Web',
+  sentAt: dayjs('2023-06-10T16:50'),
+  recipientId: 'd2b9fa23-7351-4489-a56f-f43ea7003767',
 };
 
 export const sampleWithFullData: INotification = {
-  id: 42557,
-  reservationId: '6dc9bd28-a2c4-4b2d-931e-c1b1dc7e5b0c',
-  message: 'Soft Borders',
-  sentAt: dayjs('2023-06-10T04:29'),
-  recipientId: 'a35f2944-7654-47bc-a3bc-41259f6d212c',
+  id: 10550,
+  message: 'parse Cotton Fresh',
+  sentAt: dayjs('2023-06-10T19:18'),
+  recipientId: 'a9ac5af0-3db9-408a-ab23-602b58041194',
 };
 
 export const sampleWithNewData: NewNotification = {
-  reservationId: '68c4dce1-7fbf-4df1-8089-becb44eee5d3',
-  sentAt: dayjs('2023-06-10T17:29'),
-  recipientId: 'ee258a6e-51f5-48be-8719-b7c94a4feba6',
+  sentAt: dayjs('2023-06-10T23:15'),
+  recipientId: '45e42bf5-b66d-4c9b-928a-2c4b2d131ec1',
   id: null,
 };
 

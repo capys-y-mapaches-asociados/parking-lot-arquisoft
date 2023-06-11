@@ -19,7 +19,6 @@
         "title": "Reservation"
       },
       "id": "ID",
-      "customerId": "Customer Id",
       "parkingSpotId": "Parking Spot Id",
       "startTime": "Start Time",
       "endTime": "End Time",

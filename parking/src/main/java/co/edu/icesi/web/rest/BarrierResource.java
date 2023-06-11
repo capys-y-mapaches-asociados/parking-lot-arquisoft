@@ -14,10 +14,15 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
  * REST controller for managing {@link co.edu.icesi.domain.Barrier}.
@@ -50,16 +55,23 @@ public class BarrierResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/barriers")
-    public ResponseEntity<BarrierDTO> createBarrier(@Valid @RequestBody BarrierDTO barrierDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<BarrierDTO>> createBarrier(@Valid @RequestBody BarrierDTO barrierDTO) throws URISyntaxException {
         log.debug("REST request to save Barrier : {}", barrierDTO);
         if (barrierDTO.getId() != null) {
             throw new BadRequestAlertException("A new barrier cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        BarrierDTO result = barrierService.save(barrierDTO);
-        return ResponseEntity
-            .created(new URI("/api/barriers/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return barrierService
+            .save(barrierDTO)
+            .map(result -> {
+                try {
+                    return ResponseEntity
+                        .created(new URI("/api/barriers/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     /**
@@ -73,7 +85,7 @@ public class BarrierResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/barriers/{id}")
-    public ResponseEntity<BarrierDTO> updateBarrier(
+    public Mono<ResponseEntity<BarrierDTO>> updateBarrier(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody BarrierDTO barrierDTO
     ) throws URISyntaxException {
@@ -85,15 +97,23 @@ public class BarrierResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!barrierRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return barrierRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        BarrierDTO result = barrierService.update(barrierDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, barrierDTO.getId().toString()))
-            .body(result);
+                return barrierService
+                    .update(barrierDTO)
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(result ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result)
+                    );
+            });
     }
 
     /**
@@ -108,7 +128,7 @@ public class BarrierResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/barriers/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<BarrierDTO> partialUpdateBarrier(
+    public Mono<ResponseEntity<BarrierDTO>> partialUpdateBarrier(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody BarrierDTO barrierDTO
     ) throws URISyntaxException {
@@ -120,16 +140,24 @@ public class BarrierResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!barrierRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return barrierRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        Optional<BarrierDTO> result = barrierService.partialUpdate(barrierDTO);
+                Mono<BarrierDTO> result = barrierService.partialUpdate(barrierDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, barrierDTO.getId().toString())
-        );
+                return result
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(res ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                            .body(res)
+                    );
+            });
     }
 
     /**
@@ -138,8 +166,18 @@ public class BarrierResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of barriers in body.
      */
     @GetMapping("/barriers")
-    public List<BarrierDTO> getAllBarriers() {
+    public Mono<List<BarrierDTO>> getAllBarriers() {
         log.debug("REST request to get all Barriers");
+        return barrierService.findAll().collectList();
+    }
+
+    /**
+     * {@code GET  /barriers} : get all the barriers as a stream.
+     * @return the {@link Flux} of barriers.
+     */
+    @GetMapping(value = "/barriers", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<BarrierDTO> getAllBarriersAsStream() {
+        log.debug("REST request to get all Barriers as a stream");
         return barrierService.findAll();
     }
 
@@ -150,9 +188,9 @@ public class BarrierResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the barrierDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/barriers/{id}")
-    public ResponseEntity<BarrierDTO> getBarrier(@PathVariable Long id) {
+    public Mono<ResponseEntity<BarrierDTO>> getBarrier(@PathVariable Long id) {
         log.debug("REST request to get Barrier : {}", id);
-        Optional<BarrierDTO> barrierDTO = barrierService.findOne(id);
+        Mono<BarrierDTO> barrierDTO = barrierService.findOne(id);
         return ResponseUtil.wrapOrNotFound(barrierDTO);
     }
 
@@ -163,12 +201,17 @@ public class BarrierResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/barriers/{id}")
-    public ResponseEntity<Void> deleteBarrier(@PathVariable Long id) {
+    public Mono<ResponseEntity<Void>> deleteBarrier(@PathVariable Long id) {
         log.debug("REST request to delete Barrier : {}", id);
-        barrierService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return barrierService
+            .delete(id)
+            .then(
+                Mono.just(
+                    ResponseEntity
+                        .noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
+                )
+            );
     }
 }

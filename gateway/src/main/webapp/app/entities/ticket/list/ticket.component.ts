@@ -14,7 +14,7 @@ import { SortService } from 'app/shared/sort/sort.service';
   templateUrl: './ticket.component.html',
 })
 export class TicketComponent implements OnInit {
-  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['ticketCode', 'parkingSpotId', 'status'];
+  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['ticketCode', 'status'];
 
   tickets?: ITicket[];
   isLoading = false;

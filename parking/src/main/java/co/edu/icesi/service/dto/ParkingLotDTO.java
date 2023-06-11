@@ -12,14 +12,14 @@ public class ParkingLotDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private String name;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Size(min = 12)
     private String location;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Max(value = 13000)
     private Integer capacity;
 

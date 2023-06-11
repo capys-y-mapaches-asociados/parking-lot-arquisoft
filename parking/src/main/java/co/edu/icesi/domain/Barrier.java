@@ -4,46 +4,43 @@ import co.edu.icesi.domain.enumeration.BarrierStatus;
 import co.edu.icesi.domain.enumeration.BarrierType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Barrier.
  */
-@Entity
-@Table(name = "barrier")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("barrier")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Barrier implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("name")
     private String name;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("type")
     private BarrierType type;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("status")
     private BarrierStatus status;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @Transient
     @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLot;
+
+    @Column("parking_lot_id")
+    private Long parkingLotId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -105,11 +102,20 @@ public class Barrier implements Serializable {
 
     public void setParkingLot(ParkingLot parkingLot) {
         this.parkingLot = parkingLot;
+        this.parkingLotId = parkingLot != null ? parkingLot.getId() : null;
     }
 
     public Barrier parkingLot(ParkingLot parkingLot) {
         this.setParkingLot(parkingLot);
         return this;
+    }
+
+    public Long getParkingLotId() {
+        return this.parkingLotId;
+    }
+
+    public void setParkingLotId(Long parkingLot) {
+        this.parkingLotId = parkingLot;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

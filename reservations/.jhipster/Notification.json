@@ -8,11 +8,6 @@
   "entityTableName": "notification",
   "fields": [
     {
-      "fieldName": "reservationId",
-      "fieldType": "UUID",
-      "fieldValidateRules": ["required"]
-    },
-    {
       "fieldName": "message",
       "fieldType": "String",
       "fieldValidateRules": ["maxlength"],

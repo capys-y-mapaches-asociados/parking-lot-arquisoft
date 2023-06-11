@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.CustomerDTO;
 import co.edu.icesi.service.mapper.CustomerMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link Customer}.
@@ -33,23 +34,19 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO save(CustomerDTO customerDTO) {
+    public Mono<CustomerDTO> save(CustomerDTO customerDTO) {
         log.debug("Request to save Customer : {}", customerDTO);
-        Customer customer = customerMapper.toEntity(customerDTO);
-        customer = customerRepository.save(customer);
-        return customerMapper.toDto(customer);
+        return customerRepository.save(customerMapper.toEntity(customerDTO)).map(customerMapper::toDto);
     }
 
     @Override
-    public CustomerDTO update(CustomerDTO customerDTO) {
+    public Mono<CustomerDTO> update(CustomerDTO customerDTO) {
         log.debug("Request to update Customer : {}", customerDTO);
-        Customer customer = customerMapper.toEntity(customerDTO);
-        customer = customerRepository.save(customer);
-        return customerMapper.toDto(customer);
+        return customerRepository.save(customerMapper.toEntity(customerDTO)).map(customerMapper::toDto);
     }
 
     @Override
-    public Optional<CustomerDTO> partialUpdate(CustomerDTO customerDTO) {
+    public Mono<CustomerDTO> partialUpdate(CustomerDTO customerDTO) {
         log.debug("Request to partially update Customer : {}", customerDTO);
 
         return customerRepository
@@ -59,27 +56,31 @@ public class CustomerServiceImpl implements CustomerService {
 
                 return existingCustomer;
             })
-            .map(customerRepository::save)
+            .flatMap(customerRepository::save)
             .map(customerMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CustomerDTO> findAll() {
+    public Flux<CustomerDTO> findAll() {
         log.debug("Request to get all Customers");
-        return customerRepository.findAll().stream().map(customerMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return customerRepository.findAll().map(customerMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return customerRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CustomerDTO> findOne(Long id) {
+    public Mono<CustomerDTO> findOne(Long id) {
         log.debug("Request to get Customer : {}", id);
         return customerRepository.findById(id).map(customerMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete Customer : {}", id);
-        customerRepository.deleteById(id);
+        return customerRepository.deleteById(id);
     }
 }

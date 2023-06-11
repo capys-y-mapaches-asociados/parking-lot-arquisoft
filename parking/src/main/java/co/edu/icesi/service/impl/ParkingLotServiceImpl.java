@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.ParkingLotDTO;
 import co.edu.icesi.service.mapper.ParkingLotMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link ParkingLot}.
@@ -33,23 +34,19 @@ public class ParkingLotServiceImpl implements ParkingLotService {
     }
 
     @Override
-    public ParkingLotDTO save(ParkingLotDTO parkingLotDTO) {
+    public Mono<ParkingLotDTO> save(ParkingLotDTO parkingLotDTO) {
         log.debug("Request to save ParkingLot : {}", parkingLotDTO);
-        ParkingLot parkingLot = parkingLotMapper.toEntity(parkingLotDTO);
-        parkingLot = parkingLotRepository.save(parkingLot);
-        return parkingLotMapper.toDto(parkingLot);
+        return parkingLotRepository.save(parkingLotMapper.toEntity(parkingLotDTO)).map(parkingLotMapper::toDto);
     }
 
     @Override
-    public ParkingLotDTO update(ParkingLotDTO parkingLotDTO) {
+    public Mono<ParkingLotDTO> update(ParkingLotDTO parkingLotDTO) {
         log.debug("Request to update ParkingLot : {}", parkingLotDTO);
-        ParkingLot parkingLot = parkingLotMapper.toEntity(parkingLotDTO);
-        parkingLot = parkingLotRepository.save(parkingLot);
-        return parkingLotMapper.toDto(parkingLot);
+        return parkingLotRepository.save(parkingLotMapper.toEntity(parkingLotDTO)).map(parkingLotMapper::toDto);
     }
 
     @Override
-    public Optional<ParkingLotDTO> partialUpdate(ParkingLotDTO parkingLotDTO) {
+    public Mono<ParkingLotDTO> partialUpdate(ParkingLotDTO parkingLotDTO) {
         log.debug("Request to partially update ParkingLot : {}", parkingLotDTO);
 
         return parkingLotRepository
@@ -59,27 +56,31 @@ public class ParkingLotServiceImpl implements ParkingLotService {
 
                 return existingParkingLot;
             })
-            .map(parkingLotRepository::save)
+            .flatMap(parkingLotRepository::save)
             .map(parkingLotMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ParkingLotDTO> findAll() {
+    public Flux<ParkingLotDTO> findAll() {
         log.debug("Request to get all ParkingLots");
-        return parkingLotRepository.findAll().stream().map(parkingLotMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return parkingLotRepository.findAll().map(parkingLotMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return parkingLotRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ParkingLotDTO> findOne(Long id) {
+    public Mono<ParkingLotDTO> findOne(Long id) {
         log.debug("Request to get ParkingLot : {}", id);
         return parkingLotRepository.findById(id).map(parkingLotMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete ParkingLot : {}", id);
-        parkingLotRepository.deleteById(id);
+        return parkingLotRepository.deleteById(id);
     }
 }

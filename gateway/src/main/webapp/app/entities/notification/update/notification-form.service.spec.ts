@@ -20,7 +20,6 @@ describe('Notification Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            reservationId: expect.any(Object),
             message: expect.any(Object),
             sentAt: expect.any(Object),
             recipientId: expect.any(Object),
@@ -34,7 +33,6 @@ describe('Notification Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            reservationId: expect.any(Object),
             message: expect.any(Object),
             sentAt: expect.any(Object),
             recipientId: expect.any(Object),

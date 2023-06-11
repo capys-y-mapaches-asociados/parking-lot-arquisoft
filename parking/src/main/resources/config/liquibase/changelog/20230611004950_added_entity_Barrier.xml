@@ -11,7 +11,7 @@
     -->
     <changeSet id="20230611004950-1" author="jhipster">
         <createTable tableName="barrier">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">

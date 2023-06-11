@@ -18,27 +18,6 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.reservation.customerId" for="field_customerId">Customer Id</label>
-          <input
-            type="text"
-            class="form-control"
-            name="customerId"
-            id="field_customerId"
-            data-cy="customerId"
-            formControlName="customerId"
-          />
-          <div *ngIf="editForm.get('customerId')!.invalid && (editForm.get('customerId')!.dirty || editForm.get('customerId')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('customerId')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gatewayApp.reservation.parkingSpotId" for="field_parkingSpotId">Parking Spot Id</label>
           <input
             type="text"

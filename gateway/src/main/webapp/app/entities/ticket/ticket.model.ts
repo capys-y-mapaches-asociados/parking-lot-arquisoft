@@ -6,7 +6,6 @@ export interface ITicket {
   id: number;
   ticketCode?: string | null;
   issuedAt?: dayjs.Dayjs | null;
-  parkingSpotId?: string | null;
   entryTime?: dayjs.Dayjs | null;
   exitTime?: dayjs.Dayjs | null;
   status?: TicketStatus | null;

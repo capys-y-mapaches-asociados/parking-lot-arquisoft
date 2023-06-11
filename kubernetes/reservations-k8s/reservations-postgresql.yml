@@ -7,7 +7,7 @@ metadata:
     app: reservations-postgresql
 type: Opaque
 data:
-  postgresql-password: Yjk1ZmFlY2JhOTY2OGI3MDkyNDQwYzlmZTBkMGY5MGQ0YTI2ZjEyNDA2OGIwZDM3MGVlYjA3ZWZiNTVm
+  postgresql-password: YTU0NDEyYWVjMjczYzQ2ZDU5MTNiZGYyZmY2ZjY2N2RlM2ZjNjhmYjM4NDczZThjMzUzNTk5ZTI2MmE5
 ---
 apiVersion: apps/v1
 kind: Deployment

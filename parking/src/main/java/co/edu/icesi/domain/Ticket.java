@@ -4,59 +4,52 @@ import co.edu.icesi.domain.enumeration.TicketStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Ticket.
  */
-@Entity
-@Table(name = "ticket")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("ticket")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Ticket implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[A-F0-9]{6, 10}$")
-    @Column(name = "ticket_code", nullable = false, unique = true)
+    @Column("ticket_code")
     private String ticketCode;
 
-    @NotNull
-    @Column(name = "issued_at", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("issued_at")
     private Instant issuedAt;
 
-    @NotNull
-    @Column(name = "parking_spot_id", nullable = false)
-    private UUID parkingSpotId;
-
-    @NotNull
-    @Column(name = "entry_time", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("entry_time")
     private Instant entryTime;
 
-    @NotNull
-    @Column(name = "exit_time", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("exit_time")
     private Instant exitTime;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("status")
     private TicketStatus status;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @Transient
     @JsonIgnoreProperties(value = { "parkingLotId" }, allowSetters = true)
     private ParkingSpot parkingSpotId;
+
+    @Column("parking_spot_id_id")
+    private Long parkingSpotIdId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -97,19 +90,6 @@ public class Ticket implements Serializable {
 
     public void setIssuedAt(Instant issuedAt) {
         this.issuedAt = issuedAt;
-    }
-
-    public UUID getParkingSpotId() {
-        return this.parkingSpotId;
-    }
-
-    public Ticket parkingSpotId(UUID parkingSpotId) {
-        this.setParkingSpotId(parkingSpotId);
-        return this;
-    }
-
-    public void setParkingSpotId(UUID parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
     }
 
     public Instant getEntryTime() {
@@ -157,11 +137,20 @@ public class Ticket implements Serializable {
 
     public void setParkingSpotId(ParkingSpot parkingSpot) {
         this.parkingSpotId = parkingSpot;
+        this.parkingSpotIdId = parkingSpot != null ? parkingSpot.getId() : null;
     }
 
     public Ticket parkingSpotId(ParkingSpot parkingSpot) {
         this.setParkingSpotId(parkingSpot);
         return this;
+    }
+
+    public Long getParkingSpotIdId() {
+        return this.parkingSpotIdId;
+    }
+
+    public void setParkingSpotIdId(Long parkingSpot) {
+        this.parkingSpotIdId = parkingSpot;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -190,7 +179,6 @@ public class Ticket implements Serializable {
             "id=" + getId() +
             ", ticketCode='" + getTicketCode() + "'" +
             ", issuedAt='" + getIssuedAt() + "'" +
-            ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", entryTime='" + getEntryTime() + "'" +
             ", exitTime='" + getExitTime() + "'" +
             ", status='" + getStatus() + "'" +

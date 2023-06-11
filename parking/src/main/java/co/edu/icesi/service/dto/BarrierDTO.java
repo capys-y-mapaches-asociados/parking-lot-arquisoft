@@ -14,13 +14,13 @@ public class BarrierDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private String name;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private BarrierType type;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private BarrierStatus status;
 
     private ParkingLotDTO parkingLot;

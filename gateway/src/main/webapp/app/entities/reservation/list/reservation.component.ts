@@ -14,7 +14,7 @@ import { SortService } from 'app/shared/sort/sort.service';
   templateUrl: './reservation.component.html',
 })
 export class ReservationComponent implements OnInit {
-  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['customerId', 'parkingSpotId', 'status', 'reservationCode'];
+  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['parkingSpotId', 'status', 'reservationCode'];
 
   reservations?: IReservation[];
   isLoading = false;

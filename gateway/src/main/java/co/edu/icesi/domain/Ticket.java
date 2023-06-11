@@ -4,7 +4,6 @@ import co.edu.icesi.domain.enumeration.TicketStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -33,10 +32,6 @@ public class Ticket implements Serializable {
     @NotNull(message = "must not be null")
     @Column("issued_at")
     private Instant issuedAt;
-
-    @NotNull(message = "must not be null")
-    @Column("parking_spot_id")
-    private UUID parkingSpotId;
 
     @NotNull(message = "must not be null")
     @Column("entry_time")
@@ -96,19 +91,6 @@ public class Ticket implements Serializable {
 
     public void setIssuedAt(Instant issuedAt) {
         this.issuedAt = issuedAt;
-    }
-
-    public UUID getParkingSpotId() {
-        return this.parkingSpotId;
-    }
-
-    public Ticket parkingSpotId(UUID parkingSpotId) {
-        this.setParkingSpotId(parkingSpotId);
-        return this;
-    }
-
-    public void setParkingSpotId(UUID parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
     }
 
     public Instant getEntryTime() {
@@ -198,7 +180,6 @@ public class Ticket implements Serializable {
             "id=" + getId() +
             ", ticketCode='" + getTicketCode() + "'" +
             ", issuedAt='" + getIssuedAt() + "'" +
-            ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", entryTime='" + getEntryTime() + "'" +
             ", exitTime='" + getExitTime() + "'" +
             ", status='" + getStatus() + "'" +

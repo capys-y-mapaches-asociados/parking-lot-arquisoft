@@ -14,10 +14,15 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
  * REST controller for managing {@link co.edu.icesi.domain.Ticket}.
@@ -50,16 +55,23 @@ public class TicketResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/tickets")
-    public ResponseEntity<TicketDTO> createTicket(@Valid @RequestBody TicketDTO ticketDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<TicketDTO>> createTicket(@Valid @RequestBody TicketDTO ticketDTO) throws URISyntaxException {
         log.debug("REST request to save Ticket : {}", ticketDTO);
         if (ticketDTO.getId() != null) {
             throw new BadRequestAlertException("A new ticket cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        TicketDTO result = ticketService.save(ticketDTO);
-        return ResponseEntity
-            .created(new URI("/api/tickets/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return ticketService
+            .save(ticketDTO)
+            .map(result -> {
+                try {
+                    return ResponseEntity
+                        .created(new URI("/api/tickets/" + result.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                        .body(result);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            });
     }
 
     /**
@@ -73,7 +85,7 @@ public class TicketResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/tickets/{id}")
-    public ResponseEntity<TicketDTO> updateTicket(
+    public Mono<ResponseEntity<TicketDTO>> updateTicket(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody TicketDTO ticketDTO
     ) throws URISyntaxException {
@@ -85,15 +97,23 @@ public class TicketResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!ticketRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return ticketRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        TicketDTO result = ticketService.update(ticketDTO);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ticketDTO.getId().toString()))
-            .body(result);
+                return ticketService
+                    .update(ticketDTO)
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(result ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result)
+                    );
+            });
     }
 
     /**
@@ -108,7 +128,7 @@ public class TicketResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/tickets/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<TicketDTO> partialUpdateTicket(
+    public Mono<ResponseEntity<TicketDTO>> partialUpdateTicket(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody TicketDTO ticketDTO
     ) throws URISyntaxException {
@@ -120,16 +140,24 @@ public class TicketResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!ticketRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        return ticketRepository
+            .existsById(id)
+            .flatMap(exists -> {
+                if (!exists) {
+                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                }
 
-        Optional<TicketDTO> result = ticketService.partialUpdate(ticketDTO);
+                Mono<TicketDTO> result = ticketService.partialUpdate(ticketDTO);
 
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ticketDTO.getId().toString())
-        );
+                return result
+                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                    .map(res ->
+                        ResponseEntity
+                            .ok()
+                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                            .body(res)
+                    );
+            });
     }
 
     /**
@@ -138,8 +166,18 @@ public class TicketResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tickets in body.
      */
     @GetMapping("/tickets")
-    public List<TicketDTO> getAllTickets() {
+    public Mono<List<TicketDTO>> getAllTickets() {
         log.debug("REST request to get all Tickets");
+        return ticketService.findAll().collectList();
+    }
+
+    /**
+     * {@code GET  /tickets} : get all the tickets as a stream.
+     * @return the {@link Flux} of tickets.
+     */
+    @GetMapping(value = "/tickets", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<TicketDTO> getAllTicketsAsStream() {
+        log.debug("REST request to get all Tickets as a stream");
         return ticketService.findAll();
     }
 
@@ -150,9 +188,9 @@ public class TicketResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ticketDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/tickets/{id}")
-    public ResponseEntity<TicketDTO> getTicket(@PathVariable Long id) {
+    public Mono<ResponseEntity<TicketDTO>> getTicket(@PathVariable Long id) {
         log.debug("REST request to get Ticket : {}", id);
-        Optional<TicketDTO> ticketDTO = ticketService.findOne(id);
+        Mono<TicketDTO> ticketDTO = ticketService.findOne(id);
         return ResponseUtil.wrapOrNotFound(ticketDTO);
     }
 
@@ -163,12 +201,17 @@ public class TicketResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/tickets/{id}")
-    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+    public Mono<ResponseEntity<Void>> deleteTicket(@PathVariable Long id) {
         log.debug("REST request to delete Ticket : {}", id);
-        ticketService.delete(id);
-        return ResponseEntity
-            .noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-            .build();
+        return ticketService
+            .delete(id)
+            .then(
+                Mono.just(
+                    ResponseEntity
+                        .noContent()
+                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                        .build()
+                )
+            );
     }
 }

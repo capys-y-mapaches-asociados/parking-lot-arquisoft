@@ -4,7 +4,6 @@ import co.edu.icesi.domain.enumeration.TicketStatus;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -15,23 +14,20 @@ public class TicketDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[A-F0-9]{6, 10}$")
     private String ticketCode;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private Instant issuedAt;
 
-    @NotNull
-    private UUID parkingSpotId;
-
-    @NotNull
+    @NotNull(message = "must not be null")
     private Instant entryTime;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private Instant exitTime;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private TicketStatus status;
 
     private ParkingSpotDTO parkingSpotId;
@@ -58,14 +54,6 @@ public class TicketDTO implements Serializable {
 
     public void setIssuedAt(Instant issuedAt) {
         this.issuedAt = issuedAt;
-    }
-
-    public UUID getParkingSpotId() {
-        return parkingSpotId;
-    }
-
-    public void setParkingSpotId(UUID parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
     }
 
     public Instant getEntryTime() {
@@ -128,7 +116,6 @@ public class TicketDTO implements Serializable {
             "id=" + getId() +
             ", ticketCode='" + getTicketCode() + "'" +
             ", issuedAt='" + getIssuedAt() + "'" +
-            ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", entryTime='" + getEntryTime() + "'" +
             ", exitTime='" + getExitTime() + "'" +
             ", status='" + getStatus() + "'" +

@@ -20,7 +20,6 @@ describe('Reservation Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            customerId: expect.any(Object),
             parkingSpotId: expect.any(Object),
             startTime: expect.any(Object),
             endTime: expect.any(Object),
@@ -38,7 +37,6 @@ describe('Reservation Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            customerId: expect.any(Object),
             parkingSpotId: expect.any(Object),
             startTime: expect.any(Object),
             endTime: expect.any(Object),
