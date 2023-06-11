@@ -204,12 +204,12 @@ relationship ManyToOne {
 
 deployment {
   deploymentType docker-compose
-  appsFolders [gateway, parking, reservations, admissions, payments]
+  appsFolders [gateway, parking, reservations, payments]
   dockerRepositoryName "zacwastaken"
 }
 
 deployment {
   deploymentType kubernetes
-  appsFolders [gateway, parking, reservations, admissions, payments]
+  appsFolders [gateway, parking, reservations, payments]
   dockerRepositoryName "zacwastaken"
 }
