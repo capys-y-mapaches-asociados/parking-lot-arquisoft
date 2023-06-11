@@ -63,13 +63,15 @@ spec:
               value: jdbc:postgresql://reservations-postgresql.default.svc.cluster.local:5432/reservations
             - name: SPRING_DATASOURCE_USERNAME
               value: reservations
-            - name: SPRING_DATASOURCE_PASSWORD
+            - name: SPRING_R2DBC_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: reservations-postgresql
                   key: postgresql-password
             - name: SPRING_LIQUIBASE_URL
               value: jdbc:postgresql://reservations-postgresql.default.svc.cluster.local:5432/reservations
+            - name: SPRING_R2DBC_URL
+              value: r2dbc:postgresql://reservations-postgresql.default.svc.cluster.local:5432/reservations
             - name: SPRING_SLEUTH_PROPAGATION_KEYS
               value: "x-request-id,x-ot-span-context"
             - name: JAVA_OPTS

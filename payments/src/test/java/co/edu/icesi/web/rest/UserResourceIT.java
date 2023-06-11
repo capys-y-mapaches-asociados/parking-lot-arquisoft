@@ -1,14 +1,14 @@
 package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
+import co.edu.icesi.config.Constants;
 import co.edu.icesi.domain.Authority;
 import co.edu.icesi.domain.User;
+import co.edu.icesi.repository.AuthorityRepository;
+import co.edu.icesi.repository.EntityManager;
 import co.edu.icesi.repository.UserRepository;
 import co.edu.icesi.security.AuthoritiesConstants;
 import co.edu.icesi.service.dto.AdminUserDTO;
@@ -16,22 +16,19 @@ import co.edu.icesi.service.mapper.UserMapper;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
-import javax.persistence.EntityManager;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.cache.CacheManager;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * Integration tests for the {@link UserResource} REST controller.
  */
-@AutoConfigureMockMvc
+@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 @IntegrationTest
 class UserResourceIT {
@@ -54,23 +51,22 @@ class UserResourceIT {
     private UserRepository userRepository;
 
     @Autowired
+    private AuthorityRepository authorityRepository;
+
+    @Autowired
     private UserMapper userMapper;
 
     @Autowired
     private EntityManager em;
 
     @Autowired
-    private CacheManager cacheManager;
-
-    @Autowired
-    private MockMvc restUserMockMvc;
+    private WebTestClient webTestClient;
 
     private User user;
 
     @BeforeEach
-    public void setup() {
-        cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
-        cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
+    public void setupCsrf() {
+        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     /**
@@ -89,14 +85,28 @@ class UserResourceIT {
         user.setLastName(DEFAULT_LASTNAME);
         user.setImageUrl(DEFAULT_IMAGEURL);
         user.setLangKey(DEFAULT_LANGKEY);
+        user.setCreatedBy(Constants.SYSTEM);
         return user;
+    }
+
+    /**
+     * Delete all the users from the database.
+     */
+    public static void deleteEntities(EntityManager em) {
+        try {
+            em.deleteAll("jhi_user_authority").block();
+            em.deleteAll(User.class).block();
+        } catch (Exception e) {
+            // It can fail, if other entities are still referring this - it will be removed later.
+        }
     }
 
     /**
      * Setups the database with one user.
      */
     public static User initTestUser(UserRepository userRepository, EntityManager em) {
-        userRepository.deleteAll();
+        userRepository.deleteAllUserAuthorities().block();
+        userRepository.deleteAll().block();
         User user = createEntity(em);
         user.setLogin(DEFAULT_LOGIN);
         user.setEmail(DEFAULT_EMAIL);
@@ -205,6 +215,6 @@ class UserResourceIT {
     }
 
     private void assertPersistedUsers(Consumer<List<User>> userAssertion) {
-        userAssertion.accept(userRepository.findAll());
+        userAssertion.accept(userRepository.findAll().collectList().block());
     }
 }

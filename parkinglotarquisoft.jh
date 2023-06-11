@@ -20,6 +20,7 @@ application {
 application {
   config {
     baseName parking,
+    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -38,6 +39,7 @@ application {
 application {
   config {
     baseName reservations,
+    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -49,11 +51,14 @@ application {
     serviceDiscoveryType eureka,
   }
   entities Reservation, Customer, Notification
+  dto * with mapstruct
+  service * with serviceImpl
 }
 
 application {
   config {
     baseName payments,
+    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -65,6 +70,8 @@ application {
     serviceDiscoveryType eureka,
   }
   entities Payment
+  dto * with mapstruct
+  service * with serviceImpl
 }
 
 enum ParkingSpotStatus {

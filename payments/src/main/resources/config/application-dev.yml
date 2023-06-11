@@ -45,24 +45,20 @@ spring:
       profile: dev
       label: main # toggle to switch to a different version of the configuration as stored in git
       # it can be set to any label, branch or commit of the configuration source Git repository
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:file:./target/h2db/db/payments;DB_CLOSE_DELAY=-1;MODE=LEGACY
-    username: payments
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
   h2:
     console:
       # disable spring boot built-in h2-console since we start it manually with correct configuration
       enabled: false
-  jpa:
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
+    url: jdbc:h2:file:./target/h2db/db/payments;DB_CLOSE_DELAY=-1;MODE=LEGACY
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
+  r2dbc:
+    url: r2dbc:h2:file://././target/h2db/db/payments;DB_CLOSE_DELAY=-1;MODE=LEGACY
+    username: payments
+    password:
   thymeleaf:
     cache: false
   sleuth:
@@ -90,10 +86,6 @@ server:
 # ===================================================================
 
 jhipster:
-  cache: # Cache configuration
-    ehcache: # Ehcache configuration
-      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
-      max-entries: 100 # Number of objects in each cache entry
   registry:
     password: admin
   # CORS is disabled by default on microservices, as you should access them through a gateway.

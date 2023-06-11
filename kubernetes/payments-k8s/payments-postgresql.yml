@@ -7,7 +7,7 @@ metadata:
     app: payments-postgresql
 type: Opaque
 data:
-  postgresql-password: MDNkMTI5NjVjNDZmZTJkMTNiY2E5ZWQxMjIzZTVmNTM4MDdhOTczYjYwZTgyNGEzZjBmODc5YWVkNDNm
+  postgresql-password: Yjk1ZmFlY2JhOTY2OGI3MDkyNDQwYzlmZTBkMGY5MGQ0YTI2ZjEyNDA2OGIwZDM3MGVlYjA3ZWZiNTVm
 ---
 apiVersion: apps/v1
 kind: Deployment
