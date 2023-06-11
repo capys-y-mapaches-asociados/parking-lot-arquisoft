@@ -26,10 +26,6 @@ public class Reservation implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
-    @Column("customer_id")
-    private UUID customerId;
-
-    @NotNull(message = "must not be null")
     @Column("parking_spot_id")
     private UUID parkingSpotId;
 
@@ -77,19 +73,6 @@ public class Reservation implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getCustomerId() {
-        return this.customerId;
-    }
-
-    public Reservation customerId(UUID customerId) {
-        this.setCustomerId(customerId);
-        return this;
-    }
-
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
     }
 
     public UUID getParkingSpotId() {
@@ -225,7 +208,6 @@ public class Reservation implements Serializable {
     public String toString() {
         return "Reservation{" +
             "id=" + getId() +
-            ", customerId='" + getCustomerId() + "'" +
             ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +

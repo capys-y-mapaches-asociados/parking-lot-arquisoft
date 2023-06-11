@@ -15,11 +15,7 @@ describe('Notification e2e test', () => {
   const notificationPageUrlPattern = new RegExp('/notification(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const notificationSample = {
-    reservationId: 'efb2d702-c76d-4f0c-b2bf-8a0376b17790',
-    sentAt: '2023-06-10T12:03:14.087Z',
-    recipientId: 'd129d7e9-4c5c-4e57-b26b-8c198065d154',
-  };
+  const notificationSample = { sentAt: '2023-06-10T18:06:57.352Z', recipientId: 'e657f5e7-b001-4d38-82b2-bbfb0615efb2' };
 
   let notification;
   let reservation;
@@ -34,12 +30,11 @@ describe('Notification e2e test', () => {
       method: 'POST',
       url: '/api/reservations',
       body: {
-        customerId: '0584800e-4c13-419c-9812-363ddbf3a584',
-        parkingSpotId: 'ce57e735-94f6-4d96-b184-574e7548e129',
-        startTime: '2023-06-10T03:52:43.555Z',
-        endTime: '2023-06-10T18:17:08.985Z',
+        parkingSpotId: '0584800e-4c13-419c-9812-363ddbf3a584',
+        startTime: '2023-06-10T05:46:35.706Z',
+        endTime: '2023-06-10T02:38:54.336Z',
         status: 'ACTIVE',
-        reservationCode: 'OU-5{10, 14}',
+        reservationCode: 'WM-F{10, 14}',
       },
     }).then(({ body }) => {
       reservation = body;
@@ -202,19 +197,14 @@ describe('Notification e2e test', () => {
     });
 
     it('should create an instance of Notification', () => {
-      cy.get(`[data-cy="reservationId"]`)
-        .type('e8b814ad-76c9-4333-bc42-b44982911f7d')
-        .invoke('val')
-        .should('match', new RegExp('e8b814ad-76c9-4333-bc42-b44982911f7d'));
+      cy.get(`[data-cy="message"]`).type('Buckinghamshire Gorgeous indexing').should('have.value', 'Buckinghamshire Gorgeous indexing');
 
-      cy.get(`[data-cy="message"]`).type('Account Garden').should('have.value', 'Account Garden');
-
-      cy.get(`[data-cy="sentAt"]`).type('2023-06-10T05:41').blur().should('have.value', '2023-06-10T05:41');
+      cy.get(`[data-cy="sentAt"]`).type('2023-06-10T05:45').blur().should('have.value', '2023-06-10T05:45');
 
       cy.get(`[data-cy="recipientId"]`)
-        .type('3904e657-f5e7-4b00-9d38-02b2bbfb0615')
+        .type('93333c42-b449-4829-91f7-d591a05dc390')
         .invoke('val')
-        .should('match', new RegExp('3904e657-f5e7-4b00-9d38-02b2bbfb0615'));
+        .should('match', new RegExp('93333c42-b449-4829-91f7-d591a05dc390'));
 
       cy.get(`[data-cy="reservationId"]`).select([0]);
 

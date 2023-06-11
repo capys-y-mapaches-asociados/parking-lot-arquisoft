@@ -44,9 +44,6 @@ import reactor.core.publisher.Mono;
 @WithMockUser
 class NotificationResourceIT {
 
-    private static final UUID DEFAULT_RESERVATION_ID = UUID.randomUUID();
-    private static final UUID UPDATED_RESERVATION_ID = UUID.randomUUID();
-
     private static final String DEFAULT_MESSAGE = "AAAAAAAAAA";
     private static final String UPDATED_MESSAGE = "BBBBBBBBBB";
 
@@ -87,11 +84,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createEntity(EntityManager em) {
-        Notification notification = new Notification()
-            .reservationId(DEFAULT_RESERVATION_ID)
-            .message(DEFAULT_MESSAGE)
-            .sentAt(DEFAULT_SENT_AT)
-            .recipientId(DEFAULT_RECIPIENT_ID);
+        Notification notification = new Notification().message(DEFAULT_MESSAGE).sentAt(DEFAULT_SENT_AT).recipientId(DEFAULT_RECIPIENT_ID);
         // Add required entity
         Reservation reservation;
         reservation = em.insert(ReservationResourceIT.createEntity(em)).block();
@@ -106,11 +99,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createUpdatedEntity(EntityManager em) {
-        Notification notification = new Notification()
-            .reservationId(UPDATED_RESERVATION_ID)
-            .message(UPDATED_MESSAGE)
-            .sentAt(UPDATED_SENT_AT)
-            .recipientId(UPDATED_RECIPIENT_ID);
+        Notification notification = new Notification().message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
         // Add required entity
         Reservation reservation;
         reservation = em.insert(ReservationResourceIT.createUpdatedEntity(em)).block();
@@ -174,7 +163,6 @@ class NotificationResourceIT {
                 assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
             });
         Notification testNotification = notificationList.get(notificationList.size() - 1);
-        assertThat(testNotification.getReservationId()).isEqualTo(DEFAULT_RESERVATION_ID);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
         assertThat(testNotification.getRecipientId()).isEqualTo(DEFAULT_RECIPIENT_ID);
@@ -202,31 +190,6 @@ class NotificationResourceIT {
         // Validate the Notification in the database
         List<Notification> notificationList = notificationRepository.findAll().collectList().block();
         assertThat(notificationList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(notificationSearchRepository.findAll().collectList().block());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    void checkReservationIdIsRequired() throws Exception {
-        int databaseSizeBeforeTest = notificationRepository.findAll().collectList().block().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(notificationSearchRepository.findAll().collectList().block());
-        // set the field null
-        notification.setReservationId(null);
-
-        // Create the Notification, which fails.
-        NotificationDTO notificationDTO = notificationMapper.toDto(notification);
-
-        webTestClient
-            .post()
-            .uri(ENTITY_API_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(notificationDTO))
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-
-        List<Notification> notificationList = notificationRepository.findAll().collectList().block();
-        assertThat(notificationList).hasSize(databaseSizeBeforeTest);
         int searchDatabaseSizeAfter = IterableUtil.sizeOf(notificationSearchRepository.findAll().collectList().block());
         assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
@@ -305,7 +268,6 @@ class NotificationResourceIT {
         assertThat(notificationList).isNotNull();
         assertThat(notificationList).hasSize(1);
         Notification testNotification = notificationList.get(0);
-        assertThat(testNotification.getReservationId()).isEqualTo(DEFAULT_RESERVATION_ID);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
         assertThat(testNotification.getRecipientId()).isEqualTo(DEFAULT_RECIPIENT_ID);
@@ -329,8 +291,6 @@ class NotificationResourceIT {
             .expectBody()
             .jsonPath("$.[*].id")
             .value(hasItem(notification.getId().intValue()))
-            .jsonPath("$.[*].reservationId")
-            .value(hasItem(DEFAULT_RESERVATION_ID.toString()))
             .jsonPath("$.[*].message")
             .value(hasItem(DEFAULT_MESSAGE))
             .jsonPath("$.[*].sentAt")
@@ -357,8 +317,6 @@ class NotificationResourceIT {
             .expectBody()
             .jsonPath("$.id")
             .value(is(notification.getId().intValue()))
-            .jsonPath("$.reservationId")
-            .value(is(DEFAULT_RESERVATION_ID.toString()))
             .jsonPath("$.message")
             .value(is(DEFAULT_MESSAGE))
             .jsonPath("$.sentAt")
@@ -390,11 +348,7 @@ class NotificationResourceIT {
 
         // Update the notification
         Notification updatedNotification = notificationRepository.findById(notification.getId()).block();
-        updatedNotification
-            .reservationId(UPDATED_RESERVATION_ID)
-            .message(UPDATED_MESSAGE)
-            .sentAt(UPDATED_SENT_AT)
-            .recipientId(UPDATED_RECIPIENT_ID);
+        updatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
         NotificationDTO notificationDTO = notificationMapper.toDto(updatedNotification);
 
         webTestClient
@@ -410,7 +364,6 @@ class NotificationResourceIT {
         List<Notification> notificationList = notificationRepository.findAll().collectList().block();
         assertThat(notificationList).hasSize(databaseSizeBeforeUpdate);
         Notification testNotification = notificationList.get(notificationList.size() - 1);
-        assertThat(testNotification.getReservationId()).isEqualTo(UPDATED_RESERVATION_ID);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
         assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
@@ -423,7 +376,6 @@ class NotificationResourceIT {
                     notificationSearchRepository.findAll().collectList().block()
                 );
                 Notification testNotificationSearch = notificationSearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testNotificationSearch.getReservationId()).isEqualTo(UPDATED_RESERVATION_ID);
                 assertThat(testNotificationSearch.getMessage()).isEqualTo(UPDATED_MESSAGE);
                 assertThat(testNotificationSearch.getSentAt()).isEqualTo(UPDATED_SENT_AT);
                 assertThat(testNotificationSearch.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
@@ -519,7 +471,7 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification.sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        partialUpdatedNotification.recipientId(UPDATED_RECIPIENT_ID);
 
         webTestClient
             .patch()
@@ -534,9 +486,8 @@ class NotificationResourceIT {
         List<Notification> notificationList = notificationRepository.findAll().collectList().block();
         assertThat(notificationList).hasSize(databaseSizeBeforeUpdate);
         Notification testNotification = notificationList.get(notificationList.size() - 1);
-        assertThat(testNotification.getReservationId()).isEqualTo(DEFAULT_RESERVATION_ID);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
-        assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
+        assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
         assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
@@ -551,11 +502,7 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification
-            .reservationId(UPDATED_RESERVATION_ID)
-            .message(UPDATED_MESSAGE)
-            .sentAt(UPDATED_SENT_AT)
-            .recipientId(UPDATED_RECIPIENT_ID);
+        partialUpdatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
 
         webTestClient
             .patch()
@@ -570,7 +517,6 @@ class NotificationResourceIT {
         List<Notification> notificationList = notificationRepository.findAll().collectList().block();
         assertThat(notificationList).hasSize(databaseSizeBeforeUpdate);
         Notification testNotification = notificationList.get(notificationList.size() - 1);
-        assertThat(testNotification.getReservationId()).isEqualTo(UPDATED_RESERVATION_ID);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
         assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
@@ -699,8 +645,6 @@ class NotificationResourceIT {
             .expectBody()
             .jsonPath("$.[*].id")
             .value(hasItem(notification.getId().intValue()))
-            .jsonPath("$.[*].reservationId")
-            .value(hasItem(DEFAULT_RESERVATION_ID.toString()))
             .jsonPath("$.[*].message")
             .value(hasItem(DEFAULT_MESSAGE))
             .jsonPath("$.[*].sentAt")

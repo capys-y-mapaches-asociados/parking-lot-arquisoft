@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.collections4.IterableUtils;
@@ -50,9 +49,6 @@ class TicketResourceIT {
 
     private static final Instant DEFAULT_ISSUED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_ISSUED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final UUID DEFAULT_PARKING_SPOT_ID = UUID.randomUUID();
-    private static final UUID UPDATED_PARKING_SPOT_ID = UUID.randomUUID();
 
     private static final Instant DEFAULT_ENTRY_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_ENTRY_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -97,7 +93,6 @@ class TicketResourceIT {
         Ticket ticket = new Ticket()
             .ticketCode(DEFAULT_TICKET_CODE)
             .issuedAt(DEFAULT_ISSUED_AT)
-            .parkingSpotId(DEFAULT_PARKING_SPOT_ID)
             .entryTime(DEFAULT_ENTRY_TIME)
             .exitTime(DEFAULT_EXIT_TIME)
             .status(DEFAULT_STATUS);
@@ -118,7 +113,6 @@ class TicketResourceIT {
         Ticket ticket = new Ticket()
             .ticketCode(UPDATED_TICKET_CODE)
             .issuedAt(UPDATED_ISSUED_AT)
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .entryTime(UPDATED_ENTRY_TIME)
             .exitTime(UPDATED_EXIT_TIME)
             .status(UPDATED_STATUS);
@@ -187,7 +181,6 @@ class TicketResourceIT {
         Ticket testTicket = ticketList.get(ticketList.size() - 1);
         assertThat(testTicket.getTicketCode()).isEqualTo(DEFAULT_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(DEFAULT_ISSUED_AT);
-        assertThat(testTicket.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
         assertThat(testTicket.getEntryTime()).isEqualTo(DEFAULT_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(DEFAULT_EXIT_TIME);
         assertThat(testTicket.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -250,31 +243,6 @@ class TicketResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(ticketSearchRepository.findAll().collectList().block());
         // set the field null
         ticket.setIssuedAt(null);
-
-        // Create the Ticket, which fails.
-        TicketDTO ticketDTO = ticketMapper.toDto(ticket);
-
-        webTestClient
-            .post()
-            .uri(ENTITY_API_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-
-        List<Ticket> ticketList = ticketRepository.findAll().collectList().block();
-        assertThat(ticketList).hasSize(databaseSizeBeforeTest);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(ticketSearchRepository.findAll().collectList().block());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    void checkParkingSpotIdIsRequired() throws Exception {
-        int databaseSizeBeforeTest = ticketRepository.findAll().collectList().block().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(ticketSearchRepository.findAll().collectList().block());
-        // set the field null
-        ticket.setParkingSpotId(null);
 
         // Create the Ticket, which fails.
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
@@ -395,7 +363,6 @@ class TicketResourceIT {
         Ticket testTicket = ticketList.get(0);
         assertThat(testTicket.getTicketCode()).isEqualTo(DEFAULT_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(DEFAULT_ISSUED_AT);
-        assertThat(testTicket.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
         assertThat(testTicket.getEntryTime()).isEqualTo(DEFAULT_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(DEFAULT_EXIT_TIME);
         assertThat(testTicket.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -423,8 +390,6 @@ class TicketResourceIT {
             .value(hasItem(DEFAULT_TICKET_CODE))
             .jsonPath("$.[*].issuedAt")
             .value(hasItem(DEFAULT_ISSUED_AT.toString()))
-            .jsonPath("$.[*].parkingSpotId")
-            .value(hasItem(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.[*].entryTime")
             .value(hasItem(DEFAULT_ENTRY_TIME.toString()))
             .jsonPath("$.[*].exitTime")
@@ -455,8 +420,6 @@ class TicketResourceIT {
             .value(is(DEFAULT_TICKET_CODE))
             .jsonPath("$.issuedAt")
             .value(is(DEFAULT_ISSUED_AT.toString()))
-            .jsonPath("$.parkingSpotId")
-            .value(is(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.entryTime")
             .value(is(DEFAULT_ENTRY_TIME.toString()))
             .jsonPath("$.exitTime")
@@ -491,7 +454,6 @@ class TicketResourceIT {
         updatedTicket
             .ticketCode(UPDATED_TICKET_CODE)
             .issuedAt(UPDATED_ISSUED_AT)
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .entryTime(UPDATED_ENTRY_TIME)
             .exitTime(UPDATED_EXIT_TIME)
             .status(UPDATED_STATUS);
@@ -512,7 +474,6 @@ class TicketResourceIT {
         Ticket testTicket = ticketList.get(ticketList.size() - 1);
         assertThat(testTicket.getTicketCode()).isEqualTo(UPDATED_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(UPDATED_ISSUED_AT);
-        assertThat(testTicket.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
         assertThat(testTicket.getEntryTime()).isEqualTo(UPDATED_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(UPDATED_EXIT_TIME);
         assertThat(testTicket.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -525,7 +486,6 @@ class TicketResourceIT {
                 Ticket testTicketSearch = ticketSearchList.get(searchDatabaseSizeAfter - 1);
                 assertThat(testTicketSearch.getTicketCode()).isEqualTo(UPDATED_TICKET_CODE);
                 assertThat(testTicketSearch.getIssuedAt()).isEqualTo(UPDATED_ISSUED_AT);
-                assertThat(testTicketSearch.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
                 assertThat(testTicketSearch.getEntryTime()).isEqualTo(UPDATED_ENTRY_TIME);
                 assertThat(testTicketSearch.getExitTime()).isEqualTo(UPDATED_EXIT_TIME);
                 assertThat(testTicketSearch.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -621,7 +581,7 @@ class TicketResourceIT {
         Ticket partialUpdatedTicket = new Ticket();
         partialUpdatedTicket.setId(ticket.getId());
 
-        partialUpdatedTicket.ticketCode(UPDATED_TICKET_CODE).status(UPDATED_STATUS);
+        partialUpdatedTicket.ticketCode(UPDATED_TICKET_CODE);
 
         webTestClient
             .patch()
@@ -638,10 +598,9 @@ class TicketResourceIT {
         Ticket testTicket = ticketList.get(ticketList.size() - 1);
         assertThat(testTicket.getTicketCode()).isEqualTo(UPDATED_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(DEFAULT_ISSUED_AT);
-        assertThat(testTicket.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
         assertThat(testTicket.getEntryTime()).isEqualTo(DEFAULT_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(DEFAULT_EXIT_TIME);
-        assertThat(testTicket.getStatus()).isEqualTo(UPDATED_STATUS);
+        assertThat(testTicket.getStatus()).isEqualTo(DEFAULT_STATUS);
     }
 
     @Test
@@ -658,7 +617,6 @@ class TicketResourceIT {
         partialUpdatedTicket
             .ticketCode(UPDATED_TICKET_CODE)
             .issuedAt(UPDATED_ISSUED_AT)
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .entryTime(UPDATED_ENTRY_TIME)
             .exitTime(UPDATED_EXIT_TIME)
             .status(UPDATED_STATUS);
@@ -678,7 +636,6 @@ class TicketResourceIT {
         Ticket testTicket = ticketList.get(ticketList.size() - 1);
         assertThat(testTicket.getTicketCode()).isEqualTo(UPDATED_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(UPDATED_ISSUED_AT);
-        assertThat(testTicket.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
         assertThat(testTicket.getEntryTime()).isEqualTo(UPDATED_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(UPDATED_EXIT_TIME);
         assertThat(testTicket.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -811,8 +768,6 @@ class TicketResourceIT {
             .value(hasItem(DEFAULT_TICKET_CODE))
             .jsonPath("$.[*].issuedAt")
             .value(hasItem(DEFAULT_ISSUED_AT.toString()))
-            .jsonPath("$.[*].parkingSpotId")
-            .value(hasItem(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.[*].entryTime")
             .value(hasItem(DEFAULT_ENTRY_TIME.toString()))
             .jsonPath("$.[*].exitTime")

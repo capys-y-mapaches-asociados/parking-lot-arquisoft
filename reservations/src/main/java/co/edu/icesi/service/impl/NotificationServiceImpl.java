@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.NotificationDTO;
 import co.edu.icesi.service.mapper.NotificationMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link Notification}.
@@ -33,23 +34,19 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public NotificationDTO save(NotificationDTO notificationDTO) {
+    public Mono<NotificationDTO> save(NotificationDTO notificationDTO) {
         log.debug("Request to save Notification : {}", notificationDTO);
-        Notification notification = notificationMapper.toEntity(notificationDTO);
-        notification = notificationRepository.save(notification);
-        return notificationMapper.toDto(notification);
+        return notificationRepository.save(notificationMapper.toEntity(notificationDTO)).map(notificationMapper::toDto);
     }
 
     @Override
-    public NotificationDTO update(NotificationDTO notificationDTO) {
+    public Mono<NotificationDTO> update(NotificationDTO notificationDTO) {
         log.debug("Request to update Notification : {}", notificationDTO);
-        Notification notification = notificationMapper.toEntity(notificationDTO);
-        notification = notificationRepository.save(notification);
-        return notificationMapper.toDto(notification);
+        return notificationRepository.save(notificationMapper.toEntity(notificationDTO)).map(notificationMapper::toDto);
     }
 
     @Override
-    public Optional<NotificationDTO> partialUpdate(NotificationDTO notificationDTO) {
+    public Mono<NotificationDTO> partialUpdate(NotificationDTO notificationDTO) {
         log.debug("Request to partially update Notification : {}", notificationDTO);
 
         return notificationRepository
@@ -59,27 +56,31 @@ public class NotificationServiceImpl implements NotificationService {
 
                 return existingNotification;
             })
-            .map(notificationRepository::save)
+            .flatMap(notificationRepository::save)
             .map(notificationMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationDTO> findAll() {
+    public Flux<NotificationDTO> findAll() {
         log.debug("Request to get all Notifications");
-        return notificationRepository.findAll().stream().map(notificationMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return notificationRepository.findAll().map(notificationMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return notificationRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<NotificationDTO> findOne(Long id) {
+    public Mono<NotificationDTO> findOne(Long id) {
         log.debug("Request to get Notification : {}", id);
         return notificationRepository.findById(id).map(notificationMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete Notification : {}", id);
-        notificationRepository.deleteById(id);
+        return notificationRepository.deleteById(id);
     }
 }

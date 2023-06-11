@@ -19,7 +19,6 @@
         "title": "Notification"
       },
       "id": "ID",
-      "reservationId": "Reservation Id",
       "message": "Message",
       "sentAt": "Sent At",
       "recipientId": "Recipient Id",

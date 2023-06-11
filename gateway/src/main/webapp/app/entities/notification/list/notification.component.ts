@@ -14,7 +14,7 @@ import { SortService } from 'app/shared/sort/sort.service';
   templateUrl: './notification.component.html',
 })
 export class NotificationComponent implements OnInit {
-  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['reservationId', 'message', 'recipientId'];
+  private static readonly NOT_SORTABLE_FIELDS_AFTER_SEARCH = ['message', 'recipientId'];
 
   notifications?: INotification[];
   isLoading = false;

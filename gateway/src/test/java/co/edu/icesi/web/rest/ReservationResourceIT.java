@@ -44,9 +44,6 @@ import reactor.core.publisher.Mono;
 @WithMockUser
 class ReservationResourceIT {
 
-    private static final UUID DEFAULT_CUSTOMER_ID = UUID.randomUUID();
-    private static final UUID UPDATED_CUSTOMER_ID = UUID.randomUUID();
-
     private static final UUID DEFAULT_PARKING_SPOT_ID = UUID.randomUUID();
     private static final UUID UPDATED_PARKING_SPOT_ID = UUID.randomUUID();
 
@@ -94,7 +91,6 @@ class ReservationResourceIT {
      */
     public static Reservation createEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .customerId(DEFAULT_CUSTOMER_ID)
             .parkingSpotId(DEFAULT_PARKING_SPOT_ID)
             .startTime(DEFAULT_START_TIME)
             .endTime(DEFAULT_END_TIME)
@@ -111,7 +107,6 @@ class ReservationResourceIT {
      */
     public static Reservation createUpdatedEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .customerId(UPDATED_CUSTOMER_ID)
             .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
@@ -175,7 +170,6 @@ class ReservationResourceIT {
                 assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore + 1);
             });
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getCustomerId()).isEqualTo(DEFAULT_CUSTOMER_ID);
         assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
@@ -205,31 +199,6 @@ class ReservationResourceIT {
         // Validate the Reservation in the database
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeCreate);
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(reservationSearchRepository.findAll().collectList().block());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    void checkCustomerIdIsRequired() throws Exception {
-        int databaseSizeBeforeTest = reservationRepository.findAll().collectList().block().size();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(reservationSearchRepository.findAll().collectList().block());
-        // set the field null
-        reservation.setCustomerId(null);
-
-        // Create the Reservation, which fails.
-        ReservationDTO reservationDTO = reservationMapper.toDto(reservation);
-
-        webTestClient
-            .post()
-            .uri(ENTITY_API_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(reservationDTO))
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-
-        List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
-        assertThat(reservationList).hasSize(databaseSizeBeforeTest);
         int searchDatabaseSizeAfter = IterableUtil.sizeOf(reservationSearchRepository.findAll().collectList().block());
         assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
@@ -383,7 +352,6 @@ class ReservationResourceIT {
         assertThat(reservationList).isNotNull();
         assertThat(reservationList).hasSize(1);
         Reservation testReservation = reservationList.get(0);
-        assertThat(testReservation.getCustomerId()).isEqualTo(DEFAULT_CUSTOMER_ID);
         assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
@@ -409,8 +377,6 @@ class ReservationResourceIT {
             .expectBody()
             .jsonPath("$.[*].id")
             .value(hasItem(reservation.getId().intValue()))
-            .jsonPath("$.[*].customerId")
-            .value(hasItem(DEFAULT_CUSTOMER_ID.toString()))
             .jsonPath("$.[*].parkingSpotId")
             .value(hasItem(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.[*].startTime")
@@ -441,8 +407,6 @@ class ReservationResourceIT {
             .expectBody()
             .jsonPath("$.id")
             .value(is(reservation.getId().intValue()))
-            .jsonPath("$.customerId")
-            .value(is(DEFAULT_CUSTOMER_ID.toString()))
             .jsonPath("$.parkingSpotId")
             .value(is(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.startTime")
@@ -479,7 +443,6 @@ class ReservationResourceIT {
         // Update the reservation
         Reservation updatedReservation = reservationRepository.findById(reservation.getId()).block();
         updatedReservation
-            .customerId(UPDATED_CUSTOMER_ID)
             .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
@@ -500,7 +463,6 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getCustomerId()).isEqualTo(UPDATED_CUSTOMER_ID);
         assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
@@ -513,7 +475,6 @@ class ReservationResourceIT {
                 assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
                 List<Reservation> reservationSearchList = IterableUtils.toList(reservationSearchRepository.findAll().collectList().block());
                 Reservation testReservationSearch = reservationSearchList.get(searchDatabaseSizeAfter - 1);
-                assertThat(testReservationSearch.getCustomerId()).isEqualTo(UPDATED_CUSTOMER_ID);
                 assertThat(testReservationSearch.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
                 assertThat(testReservationSearch.getStartTime()).isEqualTo(UPDATED_START_TIME);
                 assertThat(testReservationSearch.getEndTime()).isEqualTo(UPDATED_END_TIME);
@@ -611,7 +572,7 @@ class ReservationResourceIT {
         Reservation partialUpdatedReservation = new Reservation();
         partialUpdatedReservation.setId(reservation.getId());
 
-        partialUpdatedReservation.customerId(UPDATED_CUSTOMER_ID).startTime(UPDATED_START_TIME);
+        partialUpdatedReservation.parkingSpotId(UPDATED_PARKING_SPOT_ID).endTime(UPDATED_END_TIME);
 
         webTestClient
             .patch()
@@ -626,10 +587,9 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getCustomerId()).isEqualTo(UPDATED_CUSTOMER_ID);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
-        assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
-        assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
+        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
+        assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
         assertThat(testReservation.getReservationCode()).isEqualTo(DEFAULT_RESERVATION_CODE);
     }
@@ -646,7 +606,6 @@ class ReservationResourceIT {
         partialUpdatedReservation.setId(reservation.getId());
 
         partialUpdatedReservation
-            .customerId(UPDATED_CUSTOMER_ID)
             .parkingSpotId(UPDATED_PARKING_SPOT_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
@@ -666,7 +625,6 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getCustomerId()).isEqualTo(UPDATED_CUSTOMER_ID);
         assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
@@ -797,8 +755,6 @@ class ReservationResourceIT {
             .expectBody()
             .jsonPath("$.[*].id")
             .value(hasItem(reservation.getId().intValue()))
-            .jsonPath("$.[*].customerId")
-            .value(hasItem(DEFAULT_CUSTOMER_ID.toString()))
             .jsonPath("$.[*].parkingSpotId")
             .value(hasItem(DEFAULT_PARKING_SPOT_ID.toString()))
             .jsonPath("$.[*].startTime")

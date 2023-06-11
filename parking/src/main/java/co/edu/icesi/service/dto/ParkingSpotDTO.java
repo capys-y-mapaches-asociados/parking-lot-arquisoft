@@ -15,17 +15,17 @@ public class ParkingSpotDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Max(value = 13000)
     private Integer number;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private ParkingSpotStatus status;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private ParkingSpotType spotType;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private ParkingSpotVehicle spotVehicle;
 
     private ParkingLotDTO parkingLotId;

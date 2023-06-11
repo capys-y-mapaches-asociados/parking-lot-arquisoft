@@ -14,9 +14,6 @@ public class NotificationDTO implements Serializable {
 
     private Long id;
 
-    @NotNull(message = "must not be null")
-    private UUID reservationId;
-
     @Size(max = 1000)
     private String message;
 
@@ -32,14 +29,6 @@ public class NotificationDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(UUID reservationId) {
-        this.reservationId = reservationId;
     }
 
     public String getMessage() {
@@ -92,7 +81,6 @@ public class NotificationDTO implements Serializable {
     public String toString() {
         return "NotificationDTO{" +
             "id=" + getId() +
-            ", reservationId='" + getReservationId() + "'" +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
             ", recipientId='" + getRecipientId() + "'" +

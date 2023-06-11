@@ -5,61 +5,59 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Reservation.
  */
-@Entity
-@Table(name = "reservation")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("reservation")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Reservation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "customer_id", nullable = false)
-    private UUID customerId;
-
-    @NotNull
-    @Column(name = "parking_spot_id", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("parking_spot_id")
     private UUID parkingSpotId;
 
-    @NotNull
-    @Column(name = "start_time", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("start_time")
     private Instant startTime;
 
-    @NotNull
-    @Column(name = "end_time", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("end_time")
     private Instant endTime;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("status")
     private ReservationStatus status;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$")
-    @Column(name = "reservation_code", nullable = false, unique = true)
+    @Column("reservation_code")
     private String reservationCode;
 
-    @ManyToOne
+    @Transient
     @JsonIgnoreProperties(value = { "reservations" }, allowSetters = true)
     private Customer customerId;
 
-    @ManyToOne
+    @Transient
     @JsonIgnoreProperties(value = { "reservationIds" }, allowSetters = true)
     private Notification notifications;
+
+    @Column("customer_id_id")
+    private Long customerIdId;
+
+    @Column("notifications_id")
+    private Long notificationsId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -74,19 +72,6 @@ public class Reservation implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getCustomerId() {
-        return this.customerId;
-    }
-
-    public Reservation customerId(UUID customerId) {
-        this.setCustomerId(customerId);
-        return this;
-    }
-
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
     }
 
     public UUID getParkingSpotId() {
@@ -160,6 +145,7 @@ public class Reservation implements Serializable {
 
     public void setCustomerId(Customer customer) {
         this.customerId = customer;
+        this.customerIdId = customer != null ? customer.getId() : null;
     }
 
     public Reservation customerId(Customer customer) {
@@ -173,11 +159,28 @@ public class Reservation implements Serializable {
 
     public void setNotifications(Notification notification) {
         this.notifications = notification;
+        this.notificationsId = notification != null ? notification.getId() : null;
     }
 
     public Reservation notifications(Notification notification) {
         this.setNotifications(notification);
         return this;
+    }
+
+    public Long getCustomerIdId() {
+        return this.customerIdId;
+    }
+
+    public void setCustomerIdId(Long customer) {
+        this.customerIdId = customer;
+    }
+
+    public Long getNotificationsId() {
+        return this.notificationsId;
+    }
+
+    public void setNotificationsId(Long notification) {
+        this.notificationsId = notification;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -204,7 +207,6 @@ public class Reservation implements Serializable {
     public String toString() {
         return "Reservation{" +
             "id=" + getId() +
-            ", customerId='" + getCustomerId() + "'" +
             ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +

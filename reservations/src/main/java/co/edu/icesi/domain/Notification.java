@@ -6,46 +6,38 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A Notification.
  */
-@Entity
-@Table(name = "notification")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("notification")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Notification implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "reservation_id", nullable = false)
-    private UUID reservationId;
-
     @Size(max = 1000)
-    @Column(name = "message", length = 1000)
+    @Column("message")
     private String message;
 
-    @NotNull
-    @Column(name = "sent_at", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("sent_at")
     private Instant sentAt;
 
-    @NotNull
-    @Column(name = "recipient_id", nullable = false)
+    @NotNull(message = "must not be null")
+    @Column("recipient_id")
     private UUID recipientId;
 
-    @OneToMany(mappedBy = "notifications")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Transient
     @JsonIgnoreProperties(value = { "customerId", "notifications" }, allowSetters = true)
     private Set<Reservation> reservationIds = new HashSet<>();
 
@@ -62,19 +54,6 @@ public class Notification implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getReservationId() {
-        return this.reservationId;
-    }
-
-    public Notification reservationId(UUID reservationId) {
-        this.setReservationId(reservationId);
-        return this;
-    }
-
-    public void setReservationId(UUID reservationId) {
-        this.reservationId = reservationId;
     }
 
     public String getMessage() {
@@ -171,7 +150,6 @@ public class Notification implements Serializable {
     public String toString() {
         return "Notification{" +
             "id=" + getId() +
-            ", reservationId='" + getReservationId() + "'" +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
             ", recipientId='" + getRecipientId() + "'" +

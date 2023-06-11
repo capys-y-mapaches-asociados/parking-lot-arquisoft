@@ -35,7 +35,6 @@ type TicketFormGroupContent = {
   id: FormControl<TicketFormRawValue['id'] | NewTicket['id']>;
   ticketCode: FormControl<TicketFormRawValue['ticketCode']>;
   issuedAt: FormControl<TicketFormRawValue['issuedAt']>;
-  parkingSpotId: FormControl<TicketFormRawValue['parkingSpotId']>;
   entryTime: FormControl<TicketFormRawValue['entryTime']>;
   exitTime: FormControl<TicketFormRawValue['exitTime']>;
   status: FormControl<TicketFormRawValue['status']>;
@@ -63,9 +62,6 @@ export class TicketFormService {
         validators: [Validators.required, Validators.pattern('^[A-F0-9]{6, 10}$')],
       }),
       issuedAt: new FormControl(ticketRawValue.issuedAt, {
-        validators: [Validators.required],
-      }),
-      parkingSpotId: new FormControl(ticketRawValue.parkingSpotId, {
         validators: [Validators.required],
       }),
       entryTime: new FormControl(ticketRawValue.entryTime, {

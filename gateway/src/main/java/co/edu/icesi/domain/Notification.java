@@ -26,10 +26,6 @@ public class Notification implements Serializable {
     @Column("id")
     private Long id;
 
-    @NotNull(message = "must not be null")
-    @Column("reservation_id")
-    private UUID reservationId;
-
     @Size(max = 1000)
     @Column("message")
     private String message;
@@ -59,19 +55,6 @@ public class Notification implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getReservationId() {
-        return this.reservationId;
-    }
-
-    public Notification reservationId(UUID reservationId) {
-        this.setReservationId(reservationId);
-        return this;
-    }
-
-    public void setReservationId(UUID reservationId) {
-        this.reservationId = reservationId;
     }
 
     public String getMessage() {
@@ -168,7 +151,6 @@ public class Notification implements Serializable {
     public String toString() {
         return "Notification{" +
             "id=" + getId() +
-            ", reservationId='" + getReservationId() + "'" +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
             ", recipientId='" + getRecipientId() + "'" +

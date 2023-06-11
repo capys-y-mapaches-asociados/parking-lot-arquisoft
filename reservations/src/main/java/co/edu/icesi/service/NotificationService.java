@@ -2,7 +2,8 @@ package co.edu.icesi.service;
 
 import co.edu.icesi.service.dto.NotificationDTO;
 import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Interface for managing {@link co.edu.icesi.domain.Notification}.
@@ -14,7 +15,7 @@ public interface NotificationService {
      * @param notificationDTO the entity to save.
      * @return the persisted entity.
      */
-    NotificationDTO save(NotificationDTO notificationDTO);
+    Mono<NotificationDTO> save(NotificationDTO notificationDTO);
 
     /**
      * Updates a notification.
@@ -22,7 +23,7 @@ public interface NotificationService {
      * @param notificationDTO the entity to update.
      * @return the persisted entity.
      */
-    NotificationDTO update(NotificationDTO notificationDTO);
+    Mono<NotificationDTO> update(NotificationDTO notificationDTO);
 
     /**
      * Partially updates a notification.
@@ -30,14 +31,21 @@ public interface NotificationService {
      * @param notificationDTO the entity to update partially.
      * @return the persisted entity.
      */
-    Optional<NotificationDTO> partialUpdate(NotificationDTO notificationDTO);
+    Mono<NotificationDTO> partialUpdate(NotificationDTO notificationDTO);
 
     /**
      * Get all the notifications.
      *
      * @return the list of entities.
      */
-    List<NotificationDTO> findAll();
+    Flux<NotificationDTO> findAll();
+
+    /**
+     * Returns the number of notifications available.
+     * @return the number of entities in the database.
+     *
+     */
+    Mono<Long> countAll();
 
     /**
      * Get the "id" notification.
@@ -45,12 +53,13 @@ public interface NotificationService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<NotificationDTO> findOne(Long id);
+    Mono<NotificationDTO> findOne(Long id);
 
     /**
      * Delete the "id" notification.
      *
      * @param id the id of the entity.
+     * @return a Mono to signal the deletion
      */
-    void delete(Long id);
+    Mono<Void> delete(Long id);
 }

@@ -14,9 +14,6 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="reservation_id" type="${uuidType}">
-                <constraints nullable="false" />
-            </column>
             <column name="message" type="varchar(1000)">
                 <constraints nullable="true" />
             </column>
@@ -48,7 +45,6 @@
                   tableName="notification"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="reservation_id" type="${uuidType}"/>
             <column name="message" type="string"/>
             <column name="sent_at" type="date"/>
             <column name="recipient_id" type="${uuidType}"/>

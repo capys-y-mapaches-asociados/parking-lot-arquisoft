@@ -20,9 +20,6 @@
             <column name="issued_at" type="${datetimeType}">
                 <constraints nullable="false" />
             </column>
-            <column name="parking_spot_id" type="${uuidType}">
-                <constraints nullable="false" />
-            </column>
             <column name="entry_time" type="${datetimeType}">
                 <constraints nullable="false" />
             </column>
@@ -61,7 +58,6 @@
             <column name="id" type="numeric"/>
             <column name="ticket_code" type="string"/>
             <column name="issued_at" type="date"/>
-            <column name="parking_spot_id" type="${uuidType}"/>
             <column name="entry_time" type="date"/>
             <column name="exit_time" type="date"/>
             <column name="status" type="string"/>

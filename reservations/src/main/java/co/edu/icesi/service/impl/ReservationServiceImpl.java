@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.ReservationDTO;
 import co.edu.icesi.service.mapper.ReservationMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link Reservation}.
@@ -33,23 +34,19 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationDTO save(ReservationDTO reservationDTO) {
+    public Mono<ReservationDTO> save(ReservationDTO reservationDTO) {
         log.debug("Request to save Reservation : {}", reservationDTO);
-        Reservation reservation = reservationMapper.toEntity(reservationDTO);
-        reservation = reservationRepository.save(reservation);
-        return reservationMapper.toDto(reservation);
+        return reservationRepository.save(reservationMapper.toEntity(reservationDTO)).map(reservationMapper::toDto);
     }
 
     @Override
-    public ReservationDTO update(ReservationDTO reservationDTO) {
+    public Mono<ReservationDTO> update(ReservationDTO reservationDTO) {
         log.debug("Request to update Reservation : {}", reservationDTO);
-        Reservation reservation = reservationMapper.toEntity(reservationDTO);
-        reservation = reservationRepository.save(reservation);
-        return reservationMapper.toDto(reservation);
+        return reservationRepository.save(reservationMapper.toEntity(reservationDTO)).map(reservationMapper::toDto);
     }
 
     @Override
-    public Optional<ReservationDTO> partialUpdate(ReservationDTO reservationDTO) {
+    public Mono<ReservationDTO> partialUpdate(ReservationDTO reservationDTO) {
         log.debug("Request to partially update Reservation : {}", reservationDTO);
 
         return reservationRepository
@@ -59,27 +56,31 @@ public class ReservationServiceImpl implements ReservationService {
 
                 return existingReservation;
             })
-            .map(reservationRepository::save)
+            .flatMap(reservationRepository::save)
             .map(reservationMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReservationDTO> findAll() {
+    public Flux<ReservationDTO> findAll() {
         log.debug("Request to get all Reservations");
-        return reservationRepository.findAll().stream().map(reservationMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return reservationRepository.findAll().map(reservationMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return reservationRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ReservationDTO> findOne(Long id) {
+    public Mono<ReservationDTO> findOne(Long id) {
         log.debug("Request to get Reservation : {}", id);
         return reservationRepository.findById(id).map(reservationMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete Reservation : {}", id);
-        reservationRepository.deleteById(id);
+        return reservationRepository.deleteById(id);
     }
 }

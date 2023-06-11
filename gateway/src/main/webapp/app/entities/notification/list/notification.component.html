@@ -64,12 +64,6 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="reservationId">
-            <div class="d-flex">
-              <span jhiTranslate="gatewayApp.notification.reservationId">Reservation Id</span>
-              <fa-icon class="p-1" *ngIf="!currentSearch" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col" jhiSortBy="message">
             <div class="d-flex">
               <span jhiTranslate="gatewayApp.notification.message">Message</span>
@@ -96,7 +90,6 @@
           <td>
             <a [routerLink]="['/notification', notification.id, 'view']">{{ notification.id }}</a>
           </td>
-          <td>{{ notification.reservationId }}</td>
           <td>{{ notification.message }}</td>
           <td>{{ notification.sentAt | formatMediumDatetime }}</td>
           <td>{{ notification.recipientId }}</td>

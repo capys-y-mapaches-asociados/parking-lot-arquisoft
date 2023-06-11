@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.TicketDTO;
 import co.edu.icesi.service.mapper.TicketMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link Ticket}.
@@ -33,23 +34,19 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO save(TicketDTO ticketDTO) {
+    public Mono<TicketDTO> save(TicketDTO ticketDTO) {
         log.debug("Request to save Ticket : {}", ticketDTO);
-        Ticket ticket = ticketMapper.toEntity(ticketDTO);
-        ticket = ticketRepository.save(ticket);
-        return ticketMapper.toDto(ticket);
+        return ticketRepository.save(ticketMapper.toEntity(ticketDTO)).map(ticketMapper::toDto);
     }
 
     @Override
-    public TicketDTO update(TicketDTO ticketDTO) {
+    public Mono<TicketDTO> update(TicketDTO ticketDTO) {
         log.debug("Request to update Ticket : {}", ticketDTO);
-        Ticket ticket = ticketMapper.toEntity(ticketDTO);
-        ticket = ticketRepository.save(ticket);
-        return ticketMapper.toDto(ticket);
+        return ticketRepository.save(ticketMapper.toEntity(ticketDTO)).map(ticketMapper::toDto);
     }
 
     @Override
-    public Optional<TicketDTO> partialUpdate(TicketDTO ticketDTO) {
+    public Mono<TicketDTO> partialUpdate(TicketDTO ticketDTO) {
         log.debug("Request to partially update Ticket : {}", ticketDTO);
 
         return ticketRepository
@@ -59,27 +56,31 @@ public class TicketServiceImpl implements TicketService {
 
                 return existingTicket;
             })
-            .map(ticketRepository::save)
+            .flatMap(ticketRepository::save)
             .map(ticketMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TicketDTO> findAll() {
+    public Flux<TicketDTO> findAll() {
         log.debug("Request to get all Tickets");
-        return ticketRepository.findAll().stream().map(ticketMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return ticketRepository.findAll().map(ticketMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return ticketRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<TicketDTO> findOne(Long id) {
+    public Mono<TicketDTO> findOne(Long id) {
         log.debug("Request to get Ticket : {}", id);
         return ticketRepository.findById(id).map(ticketMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete Ticket : {}", id);
-        ticketRepository.deleteById(id);
+        return ticketRepository.deleteById(id);
     }
 }

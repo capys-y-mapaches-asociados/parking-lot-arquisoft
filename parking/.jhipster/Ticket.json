@@ -19,11 +19,6 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "parkingSpotId",
-      "fieldType": "UUID",
-      "fieldValidateRules": ["required"]
-    },
-    {
       "fieldName": "entryTime",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]

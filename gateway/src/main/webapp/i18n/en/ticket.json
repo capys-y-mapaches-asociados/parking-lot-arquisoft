@@ -21,7 +21,6 @@
       "id": "ID",
       "ticketCode": "Ticket Code",
       "issuedAt": "Issued At",
-      "parkingSpotId": "Parking Spot Id",
       "entryTime": "Entry Time",
       "exitTime": "Exit Time",
       "status": "Status",

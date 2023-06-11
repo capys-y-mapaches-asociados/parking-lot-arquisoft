@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.BarrierDTO;
 import co.edu.icesi.service.mapper.BarrierMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link Barrier}.
@@ -33,23 +34,19 @@ public class BarrierServiceImpl implements BarrierService {
     }
 
     @Override
-    public BarrierDTO save(BarrierDTO barrierDTO) {
+    public Mono<BarrierDTO> save(BarrierDTO barrierDTO) {
         log.debug("Request to save Barrier : {}", barrierDTO);
-        Barrier barrier = barrierMapper.toEntity(barrierDTO);
-        barrier = barrierRepository.save(barrier);
-        return barrierMapper.toDto(barrier);
+        return barrierRepository.save(barrierMapper.toEntity(barrierDTO)).map(barrierMapper::toDto);
     }
 
     @Override
-    public BarrierDTO update(BarrierDTO barrierDTO) {
+    public Mono<BarrierDTO> update(BarrierDTO barrierDTO) {
         log.debug("Request to update Barrier : {}", barrierDTO);
-        Barrier barrier = barrierMapper.toEntity(barrierDTO);
-        barrier = barrierRepository.save(barrier);
-        return barrierMapper.toDto(barrier);
+        return barrierRepository.save(barrierMapper.toEntity(barrierDTO)).map(barrierMapper::toDto);
     }
 
     @Override
-    public Optional<BarrierDTO> partialUpdate(BarrierDTO barrierDTO) {
+    public Mono<BarrierDTO> partialUpdate(BarrierDTO barrierDTO) {
         log.debug("Request to partially update Barrier : {}", barrierDTO);
 
         return barrierRepository
@@ -59,27 +56,31 @@ public class BarrierServiceImpl implements BarrierService {
 
                 return existingBarrier;
             })
-            .map(barrierRepository::save)
+            .flatMap(barrierRepository::save)
             .map(barrierMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BarrierDTO> findAll() {
+    public Flux<BarrierDTO> findAll() {
         log.debug("Request to get all Barriers");
-        return barrierRepository.findAll().stream().map(barrierMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return barrierRepository.findAll().map(barrierMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return barrierRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BarrierDTO> findOne(Long id) {
+    public Mono<BarrierDTO> findOne(Long id) {
         log.debug("Request to get Barrier : {}", id);
         return barrierRepository.findById(id).map(barrierMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete Barrier : {}", id);
-        barrierRepository.deleteById(id);
+        return barrierRepository.deleteById(id);
     }
 }

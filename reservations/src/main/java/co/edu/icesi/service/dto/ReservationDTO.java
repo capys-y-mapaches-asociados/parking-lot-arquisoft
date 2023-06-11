@@ -15,22 +15,19 @@ public class ReservationDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    private UUID customerId;
-
-    @NotNull
+    @NotNull(message = "must not be null")
     private UUID parkingSpotId;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private Instant startTime;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private Instant endTime;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private ReservationStatus status;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$")
     private String reservationCode;
 
@@ -44,14 +41,6 @@ public class ReservationDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
     }
 
     public UUID getParkingSpotId() {
@@ -136,7 +125,6 @@ public class ReservationDTO implements Serializable {
     public String toString() {
         return "ReservationDTO{" +
             "id=" + getId() +
-            ", customerId='" + getCustomerId() + "'" +
             ", parkingSpotId='" + getParkingSpotId() + "'" +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +

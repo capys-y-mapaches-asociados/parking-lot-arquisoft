@@ -11,11 +11,8 @@
     -->
     <changeSet id="20230611004950-1" author="jhipster">
         <createTable tableName="reservation">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="customer_id" type="${uuidType}">
-                <constraints nullable="false" />
             </column>
             <column name="parking_spot_id" type="${uuidType}">
                 <constraints nullable="false" />
@@ -61,7 +58,6 @@
                   tableName="reservation"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="customer_id" type="${uuidType}"/>
             <column name="parking_spot_id" type="${uuidType}"/>
             <column name="start_time" type="date"/>
             <column name="end_time" type="date"/>

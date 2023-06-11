@@ -16,12 +16,11 @@ describe('Reservation e2e test', () => {
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
   const reservationSample = {
-    customerId: '585a06a7-0367-442a-84cf-1c6666e09dc2',
-    parkingSpotId: 'ec995415-c650-4e86-bc5e-80eee7072bcd',
-    startTime: '2023-06-10T20:36:12.416Z',
-    endTime: '2023-06-10T22:32:15.734Z',
+    parkingSpotId: 'c626e37e-74e9-472c-8a24-b61012b52334',
+    startTime: '2023-06-10T16:02:46.110Z',
+    endTime: '2023-06-10T12:43:21.177Z',
     status: 'ACTIVE',
-    reservationCode: 'GF-d{10, 14}',
+    reservationCode: 'BK-3{10, 14}',
   };
 
   let reservation;
@@ -164,23 +163,18 @@ describe('Reservation e2e test', () => {
     });
 
     it('should create an instance of Reservation', () => {
-      cy.get(`[data-cy="customerId"]`)
+      cy.get(`[data-cy="parkingSpotId"]`)
         .type('c1be4527-67da-425d-8c43-6030b6c98ae5')
         .invoke('val')
         .should('match', new RegExp('c1be4527-67da-425d-8c43-6030b6c98ae5'));
 
-      cy.get(`[data-cy="parkingSpotId"]`)
-        .type('b9c8f98c-626e-437e-b4e9-72cca24b6101')
-        .invoke('val')
-        .should('match', new RegExp('b9c8f98c-626e-437e-b4e9-72cca24b6101'));
+      cy.get(`[data-cy="startTime"]`).type('2023-06-10T07:48').blur().should('have.value', '2023-06-10T07:48');
 
-      cy.get(`[data-cy="startTime"]`).type('2023-06-10T21:40').blur().should('have.value', '2023-06-10T21:40');
+      cy.get(`[data-cy="endTime"]`).type('2023-06-10T10:46').blur().should('have.value', '2023-06-10T10:46');
 
-      cy.get(`[data-cy="endTime"]`).type('2023-06-10T07:05').blur().should('have.value', '2023-06-10T07:05');
+      cy.get(`[data-cy="status"]`).select('CANCELLED');
 
-      cy.get(`[data-cy="status"]`).select('ACTIVE');
-
-      cy.get(`[data-cy="reservationCode"]`).type('FF-a{10, 14}').should('have.value', 'FF-a{10, 14}');
+      cy.get(`[data-cy="reservationCode"]`).type('ZP-0{10, 14}').should('have.value', 'ZP-0{10, 14}');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

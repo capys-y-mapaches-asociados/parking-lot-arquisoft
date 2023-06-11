@@ -4,49 +4,44 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
 import javax.validation.constraints.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * A ParkingLot.
  */
-@Entity
-@Table(name = "parking_lot")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Table("parking_lot")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ParkingLot implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
-    @NotNull
-    @Column(name = "name", nullable = false, unique = true)
+    @NotNull(message = "must not be null")
+    @Column("name")
     private String name;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Size(min = 12)
-    @Column(name = "location", nullable = false)
+    @Column("location")
     private String location;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Max(value = 13000)
-    @Column(name = "capacity", nullable = false)
+    @Column("capacity")
     private Integer capacity;
 
-    @OneToMany(mappedBy = "parkingLotId")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Transient
     @JsonIgnoreProperties(value = { "parkingLotId" }, allowSetters = true)
     private Set<ParkingSpot> parkingSpots = new HashSet<>();
 
-    @OneToMany(mappedBy = "parkingLot")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Transient
     @JsonIgnoreProperties(value = { "parkingLot" }, allowSetters = true)
     private Set<Barrier> barriers = new HashSet<>();
 

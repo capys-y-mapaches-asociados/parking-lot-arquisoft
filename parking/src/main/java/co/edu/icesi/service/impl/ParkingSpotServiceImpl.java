@@ -7,12 +7,13 @@ import co.edu.icesi.service.dto.ParkingSpotDTO;
 import co.edu.icesi.service.mapper.ParkingSpotMapper;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service Implementation for managing {@link ParkingSpot}.
@@ -33,23 +34,19 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
     }
 
     @Override
-    public ParkingSpotDTO save(ParkingSpotDTO parkingSpotDTO) {
+    public Mono<ParkingSpotDTO> save(ParkingSpotDTO parkingSpotDTO) {
         log.debug("Request to save ParkingSpot : {}", parkingSpotDTO);
-        ParkingSpot parkingSpot = parkingSpotMapper.toEntity(parkingSpotDTO);
-        parkingSpot = parkingSpotRepository.save(parkingSpot);
-        return parkingSpotMapper.toDto(parkingSpot);
+        return parkingSpotRepository.save(parkingSpotMapper.toEntity(parkingSpotDTO)).map(parkingSpotMapper::toDto);
     }
 
     @Override
-    public ParkingSpotDTO update(ParkingSpotDTO parkingSpotDTO) {
+    public Mono<ParkingSpotDTO> update(ParkingSpotDTO parkingSpotDTO) {
         log.debug("Request to update ParkingSpot : {}", parkingSpotDTO);
-        ParkingSpot parkingSpot = parkingSpotMapper.toEntity(parkingSpotDTO);
-        parkingSpot = parkingSpotRepository.save(parkingSpot);
-        return parkingSpotMapper.toDto(parkingSpot);
+        return parkingSpotRepository.save(parkingSpotMapper.toEntity(parkingSpotDTO)).map(parkingSpotMapper::toDto);
     }
 
     @Override
-    public Optional<ParkingSpotDTO> partialUpdate(ParkingSpotDTO parkingSpotDTO) {
+    public Mono<ParkingSpotDTO> partialUpdate(ParkingSpotDTO parkingSpotDTO) {
         log.debug("Request to partially update ParkingSpot : {}", parkingSpotDTO);
 
         return parkingSpotRepository
@@ -59,27 +56,31 @@ public class ParkingSpotServiceImpl implements ParkingSpotService {
 
                 return existingParkingSpot;
             })
-            .map(parkingSpotRepository::save)
+            .flatMap(parkingSpotRepository::save)
             .map(parkingSpotMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ParkingSpotDTO> findAll() {
+    public Flux<ParkingSpotDTO> findAll() {
         log.debug("Request to get all ParkingSpots");
-        return parkingSpotRepository.findAll().stream().map(parkingSpotMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
+        return parkingSpotRepository.findAll().map(parkingSpotMapper::toDto);
+    }
+
+    public Mono<Long> countAll() {
+        return parkingSpotRepository.count();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ParkingSpotDTO> findOne(Long id) {
+    public Mono<ParkingSpotDTO> findOne(Long id) {
         log.debug("Request to get ParkingSpot : {}", id);
         return parkingSpotRepository.findById(id).map(parkingSpotMapper::toDto);
     }
 
     @Override
-    public void delete(Long id) {
+    public Mono<Void> delete(Long id) {
         log.debug("Request to delete ParkingSpot : {}", id);
-        parkingSpotRepository.deleteById(id);
+        return parkingSpotRepository.deleteById(id);
     }
 }

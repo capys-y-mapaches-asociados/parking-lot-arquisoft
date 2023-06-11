@@ -74,31 +74,6 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.ticket.parkingSpotId" for="field_parkingSpotId">Parking Spot Id</label>
-          <input
-            type="text"
-            class="form-control"
-            name="parkingSpotId"
-            id="field_parkingSpotId"
-            data-cy="parkingSpotId"
-            formControlName="parkingSpotId"
-          />
-          <div
-            *ngIf="
-              editForm.get('parkingSpotId')!.invalid && (editForm.get('parkingSpotId')!.dirty || editForm.get('parkingSpotId')!.touched)
-            "
-          >
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('parkingSpotId')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
-            </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
           <label class="form-label" jhiTranslate="gatewayApp.ticket.entryTime" for="field_entryTime">Entry Time</label>
           <div class="d-flex">
             <input

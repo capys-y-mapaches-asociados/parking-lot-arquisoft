@@ -12,17 +12,17 @@ public class CustomerDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private String firstName;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     private String email;
 
-    @NotNull
+    @NotNull(message = "must not be null")
     @Pattern(regexp = "^[a-fA-F0-9]{64}$")
     private String password;
 
