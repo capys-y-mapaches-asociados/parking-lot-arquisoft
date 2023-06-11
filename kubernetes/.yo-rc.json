@@ -1,0 +1,24 @@
+{
+  "generator-jhipster": {
+    "appsFolders": [
+      "gateway",
+      "parking",
+      "reservations",
+      "admissions",
+      "payments"
+    ],
+    "directoryPath": "../",
+    "clusteredDbApps": [],
+    "serviceDiscoveryType": "eureka",
+    "dockerRepositoryName": "zacwastaken",
+    "dockerPushCommand": "docker push",
+    "kubernetesNamespace": "default",
+    "kubernetesServiceType": "LoadBalancer",
+    "kubernetesUseDynamicStorage": false,
+    "kubernetesStorageClassName": "",
+    "ingressDomain": "",
+    "monitoring": "no",
+    "istio": false,
+    "deploymentType": "kubernetes"
+  }
+}
