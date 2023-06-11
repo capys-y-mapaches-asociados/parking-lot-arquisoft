@@ -72,8 +72,6 @@ spec:
               value: jdbc:postgresql://gateway-postgresql.default.svc.cluster.local:5432/gateway
             - name: SPRING_R2DBC_URL
               value: r2dbc:postgresql://gateway-postgresql.default.svc.cluster.local:5432/gateway
-            - name: SPRING_ELASTICSEARCH_REST_URIS
-              value: http://gateway-elasticsearch.default.svc.cluster.local:9200
             - name: SPRING_SLEUTH_PROPAGATION_KEYS
               value: "x-request-id,x-ot-span-context"
             - name: JAVA_OPTS

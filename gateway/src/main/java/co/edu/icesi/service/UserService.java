@@ -5,7 +5,6 @@ import co.edu.icesi.domain.Authority;
 import co.edu.icesi.domain.User;
 import co.edu.icesi.repository.AuthorityRepository;
 import co.edu.icesi.repository.UserRepository;
-import co.edu.icesi.repository.search.UserSearchRepository;
 import co.edu.icesi.security.SecurityUtils;
 import co.edu.icesi.service.dto.AdminUserDTO;
 import co.edu.icesi.service.dto.UserDTO;
@@ -35,13 +34,10 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final UserSearchRepository userSearchRepository;
-
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, UserSearchRepository userSearchRepository, AuthorityRepository authorityRepository) {
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
-        this.userSearchRepository = userSearchRepository;
         this.authorityRepository = authorityRepository;
     }
 
@@ -70,7 +66,6 @@ public class UserService {
                 user.setImageUrl(imageUrl);
                 return saveUser(user);
             })
-            .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
             .doOnNext(user -> log.debug("Changed Information for User: {}", user))
             .then();
     }

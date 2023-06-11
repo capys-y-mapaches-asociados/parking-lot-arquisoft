@@ -2,14 +2,12 @@
 application {
   config {
     baseName gateway,
-    reactive true,
     applicationType gateway,
     packageName co.edu.icesi,
     authenticationType oauth2,
     prodDatabaseType postgresql,
     clientFramework angularX,
     buildTool maven,
-    searchEngine elasticsearch,
     testFrameworks [cypress],
   }
   entities * 
@@ -20,7 +18,6 @@ application {
 application {
   config {
     baseName parking,
-    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -39,7 +36,6 @@ application {
 application {
   config {
     baseName reservations,
-    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,
@@ -58,7 +54,6 @@ application {
 application {
   config {
     baseName payments,
-    reactive true,
     applicationType microservice,
     packageName co.edu.icesi,
     authenticationType oauth2,

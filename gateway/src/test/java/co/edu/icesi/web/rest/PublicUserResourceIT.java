@@ -1,7 +1,6 @@
 package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
@@ -10,7 +9,6 @@ import co.edu.icesi.config.TestSecurityConfiguration;
 import co.edu.icesi.domain.User;
 import co.edu.icesi.repository.EntityManager;
 import co.edu.icesi.repository.UserRepository;
-import co.edu.icesi.repository.search.UserSearchRepository;
 import co.edu.icesi.security.AuthoritiesConstants;
 import co.edu.icesi.service.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link UserResource} REST controller.
@@ -34,14 +31,6 @@ class PublicUserResourceIT {
 
     @Autowired
     private UserRepository userRepository;
-
-    /**
-     * This repository is mocked in the co.edu.icesi.repository.search test package.
-     *
-     * @see co.edu.icesi.repository.search.UserSearchRepositoryMockConfiguration
-     */
-    @Autowired
-    private UserSearchRepository mockUserSearchRepository;
 
     @Autowired
     private EntityManager em;

@@ -6,7 +6,6 @@ resources:
   - gateway-k8s/gateway-deployment.yml
   - gateway-k8s/gateway-service.yml
   - gateway-k8s/gateway-postgresql.yml
-  - gateway-k8s/gateway-elasticsearch.yml
   - parking-k8s/parking-deployment.yml
   - parking-k8s/parking-service.yml
   - parking-k8s/parking-postgresql.yml

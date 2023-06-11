@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -21,13 +20,11 @@ import org.springframework.data.relational.core.mapping.Table;
  * A user.
  */
 @Table("jhi_user")
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "user")
 public class User extends AbstractAuditingEntity<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull

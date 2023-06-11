@@ -10,7 +10,6 @@ export type HealthKey =
   | 'ping'
   | 'livenessState'
   | 'readinessState'
-  | 'elasticsearch'
   | 'db';
 
 export interface Health {

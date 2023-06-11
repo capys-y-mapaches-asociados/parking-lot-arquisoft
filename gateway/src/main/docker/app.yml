@@ -15,7 +15,6 @@ services:
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID=web_app
       - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET=web_app
       - JHIPSTER_SLEEP=80 # gives time for microservices, dependencies to boot before the gateway, the entire stack will be ready to accept incoming requests.
-      - SPRING_ELASTICSEARCH_URIS=http://gateway-elasticsearch:9200
     # If you want to expose these ports outside your dev PC,
     # remove the "127.0.0.1:" prefix
     ports:
@@ -32,18 +31,6 @@ services:
     # remove the "127.0.0.1:" prefix
     ports:
       - 127.0.0.1:5432:5432
-  gateway-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.4
-    # volumes:
-    #   - ~/volumes/jhipster/gateway/elasticsearch/:/usr/share/elasticsearch/data/
-    # If you want to expose these ports outside your dev PC,
-    # remove the "127.0.0.1:" prefix
-    ports:
-      - 127.0.0.1:9200:9200
-      - 127.0.0.1:9300:9300
-    environment:
-      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
-      - 'discovery.type=single-node'
   jhipster-registry:
     image: jhipster/jhipster-registry:v7.3.0
     volumes:

@@ -14,7 +14,6 @@ Launch all your infrastructure by running: `docker-compose up -d`.
 
 - gateway (gateway application)
 - gateway's postgresql database
-- gateway's elasticsearch search engine
 - parking (microservice application)
 - parking's postgresql database
 - reservations (microservice application)

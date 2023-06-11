@@ -1,7 +1,6 @@
 package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
@@ -11,7 +10,6 @@ import co.edu.icesi.domain.User;
 import co.edu.icesi.repository.AuthorityRepository;
 import co.edu.icesi.repository.EntityManager;
 import co.edu.icesi.repository.UserRepository;
-import co.edu.icesi.repository.search.UserSearchRepository;
 import co.edu.icesi.security.AuthoritiesConstants;
 import co.edu.icesi.service.dto.AdminUserDTO;
 import co.edu.icesi.service.mapper.UserMapper;
@@ -26,7 +24,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
 
 /**
  * Integration tests for the {@link UserResource} REST controller.
@@ -55,9 +52,6 @@ class UserResourceIT {
 
     @Autowired
     private AuthorityRepository authorityRepository;
-
-    @Autowired
-    private UserSearchRepository userSearchRepository;
 
     @Autowired
     private UserMapper userMapper;
