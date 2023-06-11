@@ -21,12 +21,6 @@ public interface ParkingSpotRepository extends ReactiveCrudRepository<ParkingSpo
     @Query("SELECT * FROM parking_spot entity WHERE entity.parking_lot_id_id IS NULL")
     Flux<ParkingSpot> findAllWhereParkingLotIdIsNull();
 
-    @Query("SELECT * FROM parking_spot entity WHERE entity.parking_lot_id_id = :id")
-    Flux<ParkingSpot> findByParkingLotId(Long id);
-
-    @Query("SELECT * FROM parking_spot entity WHERE entity.parking_lot_id_id IS NULL")
-    Flux<ParkingSpot> findAllWhereParkingLotIdIsNull();
-
     @Override
     <S extends ParkingSpot> Mono<S> save(S entity);
 

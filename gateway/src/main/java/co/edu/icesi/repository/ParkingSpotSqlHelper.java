@@ -17,7 +17,6 @@ public class ParkingSpotSqlHelper {
         columns.add(Column.aliased("spot_vehicle", table, columnPrefix + "_spot_vehicle"));
 
         columns.add(Column.aliased("parking_lot_id_id", table, columnPrefix + "_parking_lot_id_id"));
-        columns.add(Column.aliased("parking_lot_id_id", table, columnPrefix + "_parking_lot_id_id"));
         return columns;
     }
 }

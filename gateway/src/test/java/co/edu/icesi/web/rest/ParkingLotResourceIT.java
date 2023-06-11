@@ -88,8 +88,6 @@ class ParkingLotResourceIT {
         parkingSpot = em.insert(ParkingSpotResourceIT.createEntity(em)).block();
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
-        parkingLot.getParkingSpots().add(parkingSpot);
-        // Add required entity
         Barrier barrier;
         barrier = em.insert(BarrierResourceIT.createEntity(em)).block();
         parkingLot.getBarriers().add(barrier);
@@ -107,8 +105,6 @@ class ParkingLotResourceIT {
         // Add required entity
         ParkingSpot parkingSpot;
         parkingSpot = em.insert(ParkingSpotResourceIT.createUpdatedEntity(em)).block();
-        parkingLot.getParkingSpots().add(parkingSpot);
-        // Add required entity
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
         Barrier barrier;

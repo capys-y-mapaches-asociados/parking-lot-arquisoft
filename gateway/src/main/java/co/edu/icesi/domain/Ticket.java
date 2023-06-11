@@ -51,7 +51,7 @@ public class Ticket implements Serializable {
     private TicketStatus status;
 
     @Transient
-    @JsonIgnoreProperties(value = { "parkingLotId", "parkingLotId" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingLotId" }, allowSetters = true)
     private ParkingSpot parkingSpotId;
 
     @Column("parking_spot_id_id")

@@ -53,12 +53,10 @@ describe('ParkingSpot Management Update Component', () => {
       const parkingSpot: IParkingSpot = { id: 456 };
       const parkingLotId: IParkingLot = { id: 88905 };
       parkingSpot.parkingLotId = parkingLotId;
-      const parkingLotId: IParkingLot = { id: 30960 };
-      parkingSpot.parkingLotId = parkingLotId;
 
-      const parkingLotCollection: IParkingLot[] = [{ id: 55218 }];
+      const parkingLotCollection: IParkingLot[] = [{ id: 30960 }];
       jest.spyOn(parkingLotService, 'query').mockReturnValue(of(new HttpResponse({ body: parkingLotCollection })));
-      const additionalParkingLots = [parkingLotId, parkingLotId];
+      const additionalParkingLots = [parkingLotId];
       const expectedCollection: IParkingLot[] = [...additionalParkingLots, ...parkingLotCollection];
       jest.spyOn(parkingLotService, 'addParkingLotToCollectionIfMissing').mockReturnValue(expectedCollection);
 
@@ -75,15 +73,12 @@ describe('ParkingSpot Management Update Component', () => {
 
     it('Should update editForm', () => {
       const parkingSpot: IParkingSpot = { id: 456 };
-      const parkingLotId: IParkingLot = { id: 20413 };
-      parkingSpot.parkingLotId = parkingLotId;
-      const parkingLotId: IParkingLot = { id: 37525 };
+      const parkingLotId: IParkingLot = { id: 55218 };
       parkingSpot.parkingLotId = parkingLotId;
 
       activatedRoute.data = of({ parkingSpot });
       comp.ngOnInit();
 
-      expect(comp.parkingLotsSharedCollection).toContain(parkingLotId);
       expect(comp.parkingLotsSharedCollection).toContain(parkingLotId);
       expect(comp.parkingSpot).toEqual(parkingSpot);
     });

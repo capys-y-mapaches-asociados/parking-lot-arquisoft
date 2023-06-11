@@ -43,17 +43,8 @@ public class ParkingSpot implements Serializable {
     private ParkingSpotVehicle spotVehicle;
 
     @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLotId;
-
-    @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
-    private ParkingLot parkingLotId;
-
-    @Column("parking_lot_id_id")
-    private Long parkingLotIdId;
 
     @Column("parking_lot_id_id")
     private Long parkingLotIdId;
@@ -134,41 +125,9 @@ public class ParkingSpot implements Serializable {
         this.parkingLotIdId = parkingLot != null ? parkingLot.getId() : null;
     }
 
-    public void setParkingLotId(ParkingLot parkingLot) {
-        this.parkingLotId = parkingLot;
-        this.parkingLotIdId = parkingLot != null ? parkingLot.getId() : null;
-    }
-
     public ParkingSpot parkingLotId(ParkingLot parkingLot) {
         this.setParkingLotId(parkingLot);
         return this;
-    }
-
-    public ParkingLot getParkingLotId() {
-        return this.parkingLotId;
-    }
-
-    public void setParkingLotId(ParkingLot parkingLot) {
-        this.parkingLotId = parkingLot;
-        this.parkingLotIdId = parkingLot != null ? parkingLot.getId() : null;
-    }
-
-    public void setParkingLotId(ParkingLot parkingLot) {
-        this.parkingLotId = parkingLot;
-        this.parkingLotIdId = parkingLot != null ? parkingLot.getId() : null;
-    }
-
-    public ParkingSpot parkingLotId(ParkingLot parkingLot) {
-        this.setParkingLotId(parkingLot);
-        return this;
-    }
-
-    public Long getParkingLotIdId() {
-        return this.parkingLotIdId;
-    }
-
-    public void setParkingLotIdId(Long parkingLot) {
-        this.parkingLotIdId = parkingLot;
     }
 
     public Long getParkingLotIdId() {

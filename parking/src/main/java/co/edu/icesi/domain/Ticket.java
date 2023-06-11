@@ -55,7 +55,7 @@ public class Ticket implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "parkingLotId", "parkingLotId" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingLotId" }, allowSetters = true)
     private ParkingSpot parkingSpotId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

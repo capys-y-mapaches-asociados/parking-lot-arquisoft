@@ -42,7 +42,7 @@ public class Barrier implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLot;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

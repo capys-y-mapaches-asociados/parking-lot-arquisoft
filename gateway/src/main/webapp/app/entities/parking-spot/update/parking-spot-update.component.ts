@@ -87,7 +87,6 @@ export class ParkingSpotUpdateComponent implements OnInit {
 
     this.parkingLotsSharedCollection = this.parkingLotService.addParkingLotToCollectionIfMissing<IParkingLot>(
       this.parkingLotsSharedCollection,
-      parkingSpot.parkingLotId,
       parkingSpot.parkingLotId
     );
   }
@@ -98,11 +97,7 @@ export class ParkingSpotUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IParkingLot[]>) => res.body ?? []))
       .pipe(
         map((parkingLots: IParkingLot[]) =>
-          this.parkingLotService.addParkingLotToCollectionIfMissing<IParkingLot>(
-            parkingLots,
-            this.parkingSpot?.parkingLotId,
-            this.parkingSpot?.parkingLotId
-          )
+          this.parkingLotService.addParkingLotToCollectionIfMissing<IParkingLot>(parkingLots, this.parkingSpot?.parkingLotId)
         )
       )
       .subscribe((parkingLots: IParkingLot[]) => (this.parkingLotsSharedCollection = parkingLots));

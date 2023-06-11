@@ -10,7 +10,6 @@ export interface IParkingSpot {
   spotType?: ParkingSpotType | null;
   spotVehicle?: ParkingSpotVehicle | null;
   parkingLotId?: Pick<IParkingLot, 'id'> | null;
-  parkingLotId?: Pick<IParkingLot, 'id'> | null;
 }
 
 export type NewParkingSpot = Omit<IParkingSpot, 'id'> & { id: null };

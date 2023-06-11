@@ -51,13 +51,6 @@
       "otherEntityName": "customer",
       "otherEntityRelationshipName": "reservations",
       "relationshipName": "customerId",
-      "relationshipType": "many-to-one",
-      "relationshipValidateRules": "required"
-    },
-    {
-      "otherEntityName": "customer",
-      "otherEntityRelationshipName": "reservations",
-      "relationshipName": "customerId",
       "relationshipType": "many-to-one"
     },
     {

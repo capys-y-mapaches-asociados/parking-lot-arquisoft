@@ -51,21 +51,12 @@ public class Reservation implements Serializable {
     private String reservationCode;
 
     @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "reservations", "reservations" }, allowSetters = true)
-    private Customer customerId;
-
-    @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "reservations", "reservations" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reservations" }, allowSetters = true)
     private Customer customerId;
 
     @Transient
     @JsonIgnoreProperties(value = { "reservationIds" }, allowSetters = true)
     private Notification notifications;
-
-    @Column("customer_id_id")
-    private Long customerIdId;
 
     @Column("customer_id_id")
     private Long customerIdId;
@@ -175,30 +166,6 @@ public class Reservation implements Serializable {
         this.customerIdId = customer != null ? customer.getId() : null;
     }
 
-    public void setCustomerId(Customer customer) {
-        this.customerId = customer;
-        this.customerIdId = customer != null ? customer.getId() : null;
-    }
-
-    public Reservation customerId(Customer customer) {
-        this.setCustomerId(customer);
-        return this;
-    }
-
-    public Customer getCustomerId() {
-        return this.customerId;
-    }
-
-    public void setCustomerId(Customer customer) {
-        this.customerId = customer;
-        this.customerIdId = customer != null ? customer.getId() : null;
-    }
-
-    public void setCustomerId(Customer customer) {
-        this.customerId = customer;
-        this.customerIdId = customer != null ? customer.getId() : null;
-    }
-
     public Reservation customerId(Customer customer) {
         this.setCustomerId(customer);
         return this;
@@ -216,14 +183,6 @@ public class Reservation implements Serializable {
     public Reservation notifications(Notification notification) {
         this.setNotifications(notification);
         return this;
-    }
-
-    public Long getCustomerIdId() {
-        return this.customerIdId;
-    }
-
-    public void setCustomerIdId(Long customer) {
-        this.customerIdId = customer;
     }
 
     public Long getCustomerIdId() {

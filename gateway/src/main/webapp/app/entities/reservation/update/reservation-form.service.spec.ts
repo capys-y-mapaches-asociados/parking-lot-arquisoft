@@ -27,7 +27,6 @@ describe('Reservation Form Service', () => {
             status: expect.any(Object),
             reservationCode: expect.any(Object),
             customerId: expect.any(Object),
-            customerId: expect.any(Object),
             notifications: expect.any(Object),
           })
         );
@@ -45,7 +44,6 @@ describe('Reservation Form Service', () => {
             endTime: expect.any(Object),
             status: expect.any(Object),
             reservationCode: expect.any(Object),
-            customerId: expect.any(Object),
             customerId: expect.any(Object),
             notifications: expect.any(Object),
           })

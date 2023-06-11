@@ -41,17 +41,8 @@ public class ParkingLot implements Serializable {
     private Integer capacity;
 
     @OneToMany(mappedBy = "parkingLotId")
-    @OneToMany(mappedBy = "parkingLotId")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "parkingLotId", "parkingLotId" }, allowSetters = true)
-    private Set<ParkingSpot> parkingSpots = new HashSet<>();
-
-    @OneToMany(mappedBy = "parkingLotId")
-    @OneToMany(mappedBy = "parkingLotId")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "parkingLotId", "parkingLotId" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingLotId" }, allowSetters = true)
     private Set<ParkingSpot> parkingSpots = new HashSet<>();
 
     @OneToMany(mappedBy = "parkingLot")
@@ -111,37 +102,6 @@ public class ParkingLot implements Serializable {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
-    }
-
-    public Set<ParkingSpot> getParkingSpots() {
-        return this.parkingSpots;
-    }
-
-    public void setParkingSpots(Set<ParkingSpot> parkingSpots) {
-        if (this.parkingSpots != null) {
-            this.parkingSpots.forEach(i -> i.setParkingLotId(null));
-        }
-        if (parkingSpots != null) {
-            parkingSpots.forEach(i -> i.setParkingLotId(this));
-        }
-        this.parkingSpots = parkingSpots;
-    }
-
-    public ParkingLot parkingSpots(Set<ParkingSpot> parkingSpots) {
-        this.setParkingSpots(parkingSpots);
-        return this;
-    }
-
-    public ParkingLot addParkingSpots(ParkingSpot parkingSpot) {
-        this.parkingSpots.add(parkingSpot);
-        parkingSpot.setParkingLotId(this);
-        return this;
-    }
-
-    public ParkingLot removeParkingSpots(ParkingSpot parkingSpot) {
-        this.parkingSpots.remove(parkingSpot);
-        parkingSpot.setParkingLotId(null);
-        return this;
     }
 
     public Set<ParkingSpot> getParkingSpots() {

@@ -186,32 +186,6 @@
             formControlName="customerId"
             [compareWith]="compareCustomer"
           >
-            <option *ngIf="editForm.get(['customerId'])!.value == null" [ngValue]="null" selected></option>
-            <option [ngValue]="customerOption" *ngFor="let customerOption of customersSharedCollection">{{ customerOption.id }}</option>
-          </select>
-        </div>
-        <div
-          *ngIf="editForm.get(['customerId'])!.invalid && (editForm.get(['customerId'])!.dirty || editForm.get(['customerId'])!.touched)"
-        >
-          <small
-            class="form-text text-danger"
-            *ngIf="editForm.get(['customerId'])?.errors?.required"
-            jhiTranslate="entity.validation.required"
-          >
-            This field is required.
-          </small>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.reservation.customerId" for="field_customerId">Customer Id</label>
-          <select
-            class="form-control"
-            id="field_customerId"
-            data-cy="customerId"
-            name="customerId"
-            formControlName="customerId"
-            [compareWith]="compareCustomer"
-          >
             <option [ngValue]="null"></option>
             <option [ngValue]="customerOption" *ngFor="let customerOption of customersSharedCollection">{{ customerOption.id }}</option>
           </select>

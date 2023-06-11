@@ -37,7 +37,7 @@ public class Barrier implements Serializable {
     private BarrierStatus status;
 
     @Transient
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLot;
 
     @Column("parking_lot_id")

@@ -23,7 +23,6 @@
       "lastName": "Last Name",
       "email": "Email",
       "password": "Password",
-      "reservations": "Reservations",
       "reservations": "Reservations"
     }
   }

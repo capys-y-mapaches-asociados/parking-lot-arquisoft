@@ -19,7 +19,6 @@ public class ReservationSqlHelper {
         columns.add(Column.aliased("reservation_code", table, columnPrefix + "_reservation_code"));
 
         columns.add(Column.aliased("customer_id_id", table, columnPrefix + "_customer_id_id"));
-        columns.add(Column.aliased("customer_id_id", table, columnPrefix + "_customer_id_id"));
         columns.add(Column.aliased("notifications_id", table, columnPrefix + "_notifications_id"));
         return columns;
     }

@@ -143,7 +143,6 @@ describe('ParkingLot e2e test', () => {
           body: {
             ...parkingLotSample,
             parkingSpots: parkingSpot,
-            parkingSpots: parkingSpot,
             barriers: barrier,
           },
         }).then(({ body }) => {
@@ -240,7 +239,6 @@ describe('ParkingLot e2e test', () => {
 
       cy.get(`[data-cy="capacity"]`).type('1682').should('have.value', '1682');
 
-      cy.get(`[data-cy="parkingSpots"]`).select([0]);
       cy.get(`[data-cy="parkingSpots"]`).select([0]);
       cy.get(`[data-cy="barriers"]`).select([0]);
 

@@ -52,7 +52,6 @@ class ParkingSpotRepositoryInternalImpl extends SimpleR2dbcRepository<ParkingSpo
 
     private static final Table entityTable = Table.aliased("parking_spot", EntityManager.ENTITY_ALIAS);
     private static final Table parkingLotIdTable = Table.aliased("parking_lot", "parkingLotId");
-    private static final Table parkingLotIdTable = Table.aliased("parking_lot", "parkingLotId");
 
     public ParkingSpotRepositoryInternalImpl(
         R2dbcEntityTemplate template,
@@ -82,14 +81,10 @@ class ParkingSpotRepositoryInternalImpl extends SimpleR2dbcRepository<ParkingSpo
     RowsFetchSpec<ParkingSpot> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = ParkingSpotSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
         columns.addAll(ParkingLotSqlHelper.getColumns(parkingLotIdTable, "parkingLotId"));
-        columns.addAll(ParkingLotSqlHelper.getColumns(parkingLotIdTable, "parkingLotId"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
-            .leftOuterJoin(parkingLotIdTable)
-            .on(Column.create("parking_lot_id_id", entityTable))
-            .equals(Column.create("id", parkingLotIdTable))
             .leftOuterJoin(parkingLotIdTable)
             .on(Column.create("parking_lot_id_id", entityTable))
             .equals(Column.create("id", parkingLotIdTable));
@@ -111,7 +106,6 @@ class ParkingSpotRepositoryInternalImpl extends SimpleR2dbcRepository<ParkingSpo
 
     private ParkingSpot process(Row row, RowMetadata metadata) {
         ParkingSpot entity = parkingspotMapper.apply(row, "e");
-        entity.setParkingLotId(parkinglotMapper.apply(row, "parkingLotId"));
         entity.setParkingLotId(parkinglotMapper.apply(row, "parkingLotId"));
         return entity;
     }

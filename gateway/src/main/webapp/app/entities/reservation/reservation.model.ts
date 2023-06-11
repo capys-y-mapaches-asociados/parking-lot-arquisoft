@@ -12,7 +12,6 @@ export interface IReservation {
   status?: ReservationStatus | null;
   reservationCode?: string | null;
   customerId?: Pick<ICustomer, 'id'> | null;
-  customerId?: Pick<ICustomer, 'id'> | null;
   notifications?: Pick<INotification, 'id'> | null;
 }
 

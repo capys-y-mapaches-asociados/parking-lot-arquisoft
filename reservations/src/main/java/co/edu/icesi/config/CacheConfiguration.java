@@ -52,6 +52,11 @@ public class CacheConfiguration {
             createCache(cm, co.edu.icesi.domain.User.class.getName());
             createCache(cm, co.edu.icesi.domain.Authority.class.getName());
             createCache(cm, co.edu.icesi.domain.User.class.getName() + ".authorities");
+            createCache(cm, co.edu.icesi.domain.Reservation.class.getName());
+            createCache(cm, co.edu.icesi.domain.Notification.class.getName());
+            createCache(cm, co.edu.icesi.domain.Notification.class.getName() + ".reservationIds");
+            createCache(cm, co.edu.icesi.domain.Customer.class.getName());
+            createCache(cm, co.edu.icesi.domain.Customer.class.getName() + ".reservations");
             // jhipster-needle-ehcache-add-entry
         };
     }

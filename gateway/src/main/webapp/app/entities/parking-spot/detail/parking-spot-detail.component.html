@@ -36,12 +36,6 @@
             <a [routerLink]="['/parking-lot', parkingSpot.parkingLotId.id, 'view']">{{ parkingSpot.parkingLotId.id }}</a>
           </div>
         </dd>
-        <dt><span jhiTranslate="gatewayApp.parkingSpot.parkingLotId">Parking Lot Id</span></dt>
-        <dd>
-          <div *ngIf="parkingSpot.parkingLotId">
-            <a [routerLink]="['/parking-lot', parkingSpot.parkingLotId.id, 'view']">{{ parkingSpot.parkingLotId.id }}</a>
-          </div>
-        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

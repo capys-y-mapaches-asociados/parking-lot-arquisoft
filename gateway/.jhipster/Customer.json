@@ -40,12 +40,6 @@
       "otherEntityRelationshipName": "customerId",
       "relationshipName": "reservations",
       "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "reservation",
-      "otherEntityRelationshipName": "customerId",
-      "relationshipName": "reservations",
-      "relationshipType": "one-to-many"
     }
   ],
   "service": "serviceImpl"
