@@ -43,13 +43,7 @@ public class Customer implements Serializable {
     private String password;
 
     @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "customerId", "customerId", "notifications" }, allowSetters = true)
-    private Set<Reservation> reservations = new HashSet<>();
-
-    @Transient
-    @Transient
-    @JsonIgnoreProperties(value = { "customerId", "customerId", "notifications" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "customerId", "notifications" }, allowSetters = true)
     private Set<Reservation> reservations = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -117,37 +111,6 @@ public class Customer implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Set<Reservation> getReservations() {
-        return this.reservations;
-    }
-
-    public void setReservations(Set<Reservation> reservations) {
-        if (this.reservations != null) {
-            this.reservations.forEach(i -> i.setCustomerId(null));
-        }
-        if (reservations != null) {
-            reservations.forEach(i -> i.setCustomerId(this));
-        }
-        this.reservations = reservations;
-    }
-
-    public Customer reservations(Set<Reservation> reservations) {
-        this.setReservations(reservations);
-        return this;
-    }
-
-    public Customer addReservations(Reservation reservation) {
-        this.reservations.add(reservation);
-        reservation.setCustomerId(this);
-        return this;
-    }
-
-    public Customer removeReservations(Reservation reservation) {
-        this.reservations.remove(reservation);
-        reservation.setCustomerId(null);
-        return this;
     }
 
     public Set<Reservation> getReservations() {

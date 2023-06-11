@@ -53,16 +53,8 @@ public class Reservation implements Serializable {
     @Column(name = "reservation_code", nullable = false, unique = true)
     private String reservationCode;
 
-    @ManyToOne(optional = false)
-    @NotNull
     @ManyToOne
-    @JsonIgnoreProperties(value = { "reservations", "reservations" }, allowSetters = true)
-    private Customer customerId;
-
-    @ManyToOne(optional = false)
-    @NotNull
-    @ManyToOne
-    @JsonIgnoreProperties(value = { "reservations", "reservations" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "reservations" }, allowSetters = true)
     private Customer customerId;
 
     @ManyToOne
@@ -160,19 +152,6 @@ public class Reservation implements Serializable {
 
     public void setReservationCode(String reservationCode) {
         this.reservationCode = reservationCode;
-    }
-
-    public Customer getCustomerId() {
-        return this.customerId;
-    }
-
-    public void setCustomerId(Customer customer) {
-        this.customerId = customer;
-    }
-
-    public Reservation customerId(Customer customer) {
-        this.setCustomerId(customer);
-        return this;
     }
 
     public Customer getCustomerId() {

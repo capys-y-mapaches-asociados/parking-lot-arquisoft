@@ -30,8 +30,6 @@ public class ParkingSpotDTO implements Serializable {
 
     private ParkingLotDTO parkingLotId;
 
-    private ParkingLotDTO parkingLotId;
-
     public Long getId() {
         return id;
     }
@@ -80,14 +78,6 @@ public class ParkingSpotDTO implements Serializable {
         this.parkingLotId = parkingLotId;
     }
 
-    public ParkingLotDTO getParkingLotId() {
-        return parkingLotId;
-    }
-
-    public void setParkingLotId(ParkingLotDTO parkingLotId) {
-        this.parkingLotId = parkingLotId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -118,7 +108,6 @@ public class ParkingSpotDTO implements Serializable {
             ", status='" + getStatus() + "'" +
             ", spotType='" + getSpotType() + "'" +
             ", spotVehicle='" + getSpotVehicle() + "'" +
-            ", parkingLotId=" + getParkingLotId() +
             ", parkingLotId=" + getParkingLotId() +
             "}";
     }

@@ -96,8 +96,6 @@ class ParkingSpotResourceIT {
         ParkingLot parkingLot;
         parkingLot = em.insert(ParkingLotResourceIT.createEntity(em)).block();
         parkingSpot.setParkingLotId(parkingLot);
-        // Add required entity
-        parkingSpot.setParkingLotId(parkingLot);
         return parkingSpot;
     }
 
@@ -116,8 +114,6 @@ class ParkingSpotResourceIT {
         // Add required entity
         ParkingLot parkingLot;
         parkingLot = em.insert(ParkingLotResourceIT.createUpdatedEntity(em)).block();
-        parkingSpot.setParkingLotId(parkingLot);
-        // Add required entity
         parkingSpot.setParkingLotId(parkingLot);
         return parkingSpot;
     }

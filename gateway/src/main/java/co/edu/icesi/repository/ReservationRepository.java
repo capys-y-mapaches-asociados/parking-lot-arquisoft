@@ -21,12 +21,6 @@ public interface ReservationRepository extends ReactiveCrudRepository<Reservatio
     @Query("SELECT * FROM reservation entity WHERE entity.customer_id_id IS NULL")
     Flux<Reservation> findAllWhereCustomerIdIsNull();
 
-    @Query("SELECT * FROM reservation entity WHERE entity.customer_id_id = :id")
-    Flux<Reservation> findByCustomerId(Long id);
-
-    @Query("SELECT * FROM reservation entity WHERE entity.customer_id_id IS NULL")
-    Flux<Reservation> findAllWhereCustomerIdIsNull();
-
     @Query("SELECT * FROM reservation entity WHERE entity.notifications_id = :id")
     Flux<Reservation> findByNotifications(Long id);
 

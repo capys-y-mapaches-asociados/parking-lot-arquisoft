@@ -14,12 +14,6 @@
                                  referencedColumnNames="id"
                                  referencedTableName="customer"/>
 
-        <addForeignKeyConstraint baseColumnNames="customer_id_id"
-                                 baseTableName="reservation"
-                                 constraintName="fk_reservation__customer_id_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="customer"/>
-
         <addForeignKeyConstraint baseColumnNames="notifications_id"
                                  baseTableName="reservation"
                                  constraintName="fk_reservation__notifications_id"

@@ -120,36 +120,6 @@
             This field is required.
           </small>
         </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.parkingSpot.parkingLotId" for="field_parkingLotId">Parking Lot Id</label>
-          <select
-            class="form-control"
-            id="field_parkingLotId"
-            data-cy="parkingLotId"
-            name="parkingLotId"
-            formControlName="parkingLotId"
-            [compareWith]="compareParkingLot"
-          >
-            <option *ngIf="editForm.get(['parkingLotId'])!.value == null" [ngValue]="null" selected></option>
-            <option [ngValue]="parkingLotOption" *ngFor="let parkingLotOption of parkingLotsSharedCollection">
-              {{ parkingLotOption.id }}
-            </option>
-          </select>
-        </div>
-        <div
-          *ngIf="
-            editForm.get(['parkingLotId'])!.invalid && (editForm.get(['parkingLotId'])!.dirty || editForm.get(['parkingLotId'])!.touched)
-          "
-        >
-          <small
-            class="form-text text-danger"
-            *ngIf="editForm.get(['parkingLotId'])?.errors?.required"
-            jhiTranslate="entity.validation.required"
-          >
-            This field is required.
-          </small>
-        </div>
       </div>
 
       <div>

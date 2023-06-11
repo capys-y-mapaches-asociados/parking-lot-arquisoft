@@ -25,45 +25,15 @@ describe('Reservation e2e test', () => {
   };
 
   let reservation;
-  let customer;
 
   beforeEach(() => {
     cy.login(username, password);
   });
 
   beforeEach(() => {
-    // create an instance at the required relationship entity:
-    cy.authenticatedRequest({
-      method: 'POST',
-      url: '/api/customers',
-      body: {
-        firstName: 'Marques',
-        lastName: 'Pollich',
-        email: 'dyC6q-@Z.a.Vs.pq2.aWXc_u.U.cjz',
-        password: '5fe2C7C90A732Bc1AfaFD7a03724a3d02D086BdD1BceD18Be2F292F8bd8CF30C',
-      },
-    }).then(({ body }) => {
-      customer = body;
-    });
-  });
-
-  beforeEach(() => {
     cy.intercept('GET', '/api/reservations+(?*|)').as('entitiesRequest');
     cy.intercept('POST', '/api/reservations').as('postEntityRequest');
     cy.intercept('DELETE', '/api/reservations/*').as('deleteEntityRequest');
-  });
-
-  beforeEach(() => {
-    // Simulate relationships api for better performance and reproducibility.
-    cy.intercept('GET', '/api/customers', {
-      statusCode: 200,
-      body: [customer],
-    });
-
-    cy.intercept('GET', '/api/notifications', {
-      statusCode: 200,
-      body: [],
-    });
   });
 
   afterEach(() => {
@@ -73,17 +43,6 @@ describe('Reservation e2e test', () => {
         url: `/api/reservations/${reservation.id}`,
       }).then(() => {
         reservation = undefined;
-      });
-    }
-  });
-
-  afterEach(() => {
-    if (customer) {
-      cy.authenticatedRequest({
-        method: 'DELETE',
-        url: `/api/customers/${customer.id}`,
-      }).then(() => {
-        customer = undefined;
       });
     }
   });
@@ -127,10 +86,7 @@ describe('Reservation e2e test', () => {
         cy.authenticatedRequest({
           method: 'POST',
           url: '/api/reservations',
-          body: {
-            ...reservationSample,
-            customerId: customer,
-          },
+          body: reservationSample,
         }).then(({ body }) => {
           reservation = body;
 
@@ -225,8 +181,6 @@ describe('Reservation e2e test', () => {
       cy.get(`[data-cy="status"]`).select('ACTIVE');
 
       cy.get(`[data-cy="reservationCode"]`).type('FF-a{10, 14}').should('have.value', 'FF-a{10, 14}');
-
-      cy.get(`[data-cy="customerId"]`).select(1);
 
       cy.get(entityCreateSaveButtonSelector).click();
 

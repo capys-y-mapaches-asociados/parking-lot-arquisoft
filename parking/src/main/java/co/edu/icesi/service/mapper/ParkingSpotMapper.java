@@ -12,7 +12,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface ParkingSpotMapper extends EntityMapper<ParkingSpotDTO, ParkingSpot> {
     @Mapping(target = "parkingLotId", source = "parkingLotId", qualifiedByName = "parkingLotId")
-    @Mapping(target = "parkingLotId", source = "parkingLotId", qualifiedByName = "parkingLotId")
     ParkingSpotDTO toDto(ParkingSpot s);
 
     @Named("parkingLotId")

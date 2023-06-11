@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import co.edu.icesi.IntegrationTest;
-import co.edu.icesi.domain.Customer;
 import co.edu.icesi.domain.Reservation;
 import co.edu.icesi.domain.enumeration.ReservationStatus;
 import co.edu.icesi.repository.ReservationRepository;
@@ -89,16 +88,6 @@ class ReservationResourceIT {
             .endTime(DEFAULT_END_TIME)
             .status(DEFAULT_STATUS)
             .reservationCode(DEFAULT_RESERVATION_CODE);
-        // Add required entity
-        Customer customer;
-        if (TestUtil.findAll(em, Customer.class).isEmpty()) {
-            customer = CustomerResourceIT.createEntity(em);
-            em.persist(customer);
-            em.flush();
-        } else {
-            customer = TestUtil.findAll(em, Customer.class).get(0);
-        }
-        reservation.setCustomerId(customer);
         return reservation;
     }
 
@@ -116,16 +105,6 @@ class ReservationResourceIT {
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
             .reservationCode(UPDATED_RESERVATION_CODE);
-        // Add required entity
-        Customer customer;
-        if (TestUtil.findAll(em, Customer.class).isEmpty()) {
-            customer = CustomerResourceIT.createUpdatedEntity(em);
-            em.persist(customer);
-            em.flush();
-        } else {
-            customer = TestUtil.findAll(em, Customer.class).get(0);
-        }
-        reservation.setCustomerId(customer);
         return reservation;
     }
 

@@ -121,7 +121,6 @@ describe('ParkingSpot e2e test', () => {
           body: {
             ...parkingSpotSample,
             parkingLotId: parkingLot,
-            parkingLotId: parkingLot,
           },
         }).then(({ body }) => {
           parkingSpot = body;
@@ -219,7 +218,6 @@ describe('ParkingSpot e2e test', () => {
 
       cy.get(`[data-cy="spotVehicle"]`).select('CAR_LARGE');
 
-      cy.get(`[data-cy="parkingLotId"]`).select(1);
       cy.get(`[data-cy="parkingLotId"]`).select(1);
 
       cy.get(entityCreateSaveButtonSelector).click();

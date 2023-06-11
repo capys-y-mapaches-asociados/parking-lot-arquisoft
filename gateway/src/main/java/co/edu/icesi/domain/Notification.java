@@ -43,7 +43,7 @@ public class Notification implements Serializable {
     private UUID recipientId;
 
     @Transient
-    @JsonIgnoreProperties(value = { "customerId", "customerId", "notifications" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "customerId", "notifications" }, allowSetters = true)
     private Set<Reservation> reservationIds = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

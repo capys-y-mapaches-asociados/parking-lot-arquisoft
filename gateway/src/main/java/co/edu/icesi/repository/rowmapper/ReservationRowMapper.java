@@ -35,7 +35,6 @@ public class ReservationRowMapper implements BiFunction<Row, String, Reservation
         entity.setStatus(converter.fromRow(row, prefix + "_status", ReservationStatus.class));
         entity.setReservationCode(converter.fromRow(row, prefix + "_reservation_code", String.class));
         entity.setCustomerIdId(converter.fromRow(row, prefix + "_customer_id_id", Long.class));
-        entity.setCustomerIdId(converter.fromRow(row, prefix + "_customer_id_id", Long.class));
         entity.setNotificationsId(converter.fromRow(row, prefix + "_notifications_id", Long.class));
         return entity;
     }

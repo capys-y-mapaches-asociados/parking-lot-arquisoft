@@ -33,7 +33,6 @@ public class ParkingSpotRowMapper implements BiFunction<Row, String, ParkingSpot
         entity.setSpotType(converter.fromRow(row, prefix + "_spot_type", ParkingSpotType.class));
         entity.setSpotVehicle(converter.fromRow(row, prefix + "_spot_vehicle", ParkingSpotVehicle.class));
         entity.setParkingLotIdId(converter.fromRow(row, prefix + "_parking_lot_id_id", Long.class));
-        entity.setParkingLotIdId(converter.fromRow(row, prefix + "_parking_lot_id_id", Long.class));
         return entity;
     }
 }

@@ -54,7 +54,6 @@ class ReservationRepositoryInternalImpl extends SimpleR2dbcRepository<Reservatio
 
     private static final Table entityTable = Table.aliased("reservation", EntityManager.ENTITY_ALIAS);
     private static final Table customerIdTable = Table.aliased("customer", "customerId");
-    private static final Table customerIdTable = Table.aliased("customer", "customerId");
     private static final Table notificationsTable = Table.aliased("notification", "notifications");
 
     public ReservationRepositoryInternalImpl(
@@ -87,15 +86,11 @@ class ReservationRepositoryInternalImpl extends SimpleR2dbcRepository<Reservatio
     RowsFetchSpec<Reservation> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = ReservationSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
         columns.addAll(CustomerSqlHelper.getColumns(customerIdTable, "customerId"));
-        columns.addAll(CustomerSqlHelper.getColumns(customerIdTable, "customerId"));
         columns.addAll(NotificationSqlHelper.getColumns(notificationsTable, "notifications"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
-            .leftOuterJoin(customerIdTable)
-            .on(Column.create("customer_id_id", entityTable))
-            .equals(Column.create("id", customerIdTable))
             .leftOuterJoin(customerIdTable)
             .on(Column.create("customer_id_id", entityTable))
             .equals(Column.create("id", customerIdTable))
@@ -120,7 +115,6 @@ class ReservationRepositoryInternalImpl extends SimpleR2dbcRepository<Reservatio
 
     private Reservation process(Row row, RowMetadata metadata) {
         Reservation entity = reservationMapper.apply(row, "e");
-        entity.setCustomerId(customerMapper.apply(row, "customerId"));
         entity.setCustomerId(customerMapper.apply(row, "customerId"));
         entity.setNotifications(notificationMapper.apply(row, "notifications"));
         return entity;

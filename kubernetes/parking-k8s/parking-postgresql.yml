@@ -7,7 +7,7 @@ metadata:
     app: parking-postgresql
 type: Opaque
 data:
-  postgresql-password: OTk0NDgzODM2YjE1OTZhN2E0YWFjNGIzODg4MTNlODJmMWJhMWIzY2EwMGFkYjAzOTk3NWU3N2UzNzRl
+  postgresql-password: MDNkMTI5NjVjNDZmZTJkMTNiY2E5ZWQxMjIzZTVmNTM4MDdhOTczYjYwZTgyNGEzZjBmODc5YWVkNDNm
 ---
 apiVersion: apps/v1
 kind: Deployment

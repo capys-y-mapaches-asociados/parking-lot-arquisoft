@@ -57,12 +57,10 @@ describe('Reservation Management Update Component', () => {
       const reservation: IReservation = { id: 456 };
       const customerId: ICustomer = { id: 11998 };
       reservation.customerId = customerId;
-      const customerId: ICustomer = { id: 92899 };
-      reservation.customerId = customerId;
 
-      const customerCollection: ICustomer[] = [{ id: 84339 }];
+      const customerCollection: ICustomer[] = [{ id: 92899 }];
       jest.spyOn(customerService, 'query').mockReturnValue(of(new HttpResponse({ body: customerCollection })));
-      const additionalCustomers = [customerId, customerId];
+      const additionalCustomers = [customerId];
       const expectedCollection: ICustomer[] = [...additionalCustomers, ...customerCollection];
       jest.spyOn(customerService, 'addCustomerToCollectionIfMissing').mockReturnValue(expectedCollection);
 
@@ -101,9 +99,7 @@ describe('Reservation Management Update Component', () => {
 
     it('Should update editForm', () => {
       const reservation: IReservation = { id: 456 };
-      const customerId: ICustomer = { id: 33878 };
-      reservation.customerId = customerId;
-      const customerId: ICustomer = { id: 10319 };
+      const customerId: ICustomer = { id: 84339 };
       reservation.customerId = customerId;
       const notifications: INotification = { id: 2622 };
       reservation.notifications = notifications;
@@ -111,7 +107,6 @@ describe('Reservation Management Update Component', () => {
       activatedRoute.data = of({ reservation });
       comp.ngOnInit();
 
-      expect(comp.customersSharedCollection).toContain(customerId);
       expect(comp.customersSharedCollection).toContain(customerId);
       expect(comp.notificationsSharedCollection).toContain(notifications);
       expect(comp.reservation).toEqual(reservation);

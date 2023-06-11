@@ -39,7 +39,6 @@ type ReservationFormGroupContent = {
   status: FormControl<ReservationFormRawValue['status']>;
   reservationCode: FormControl<ReservationFormRawValue['reservationCode']>;
   customerId: FormControl<ReservationFormRawValue['customerId']>;
-  customerId: FormControl<ReservationFormRawValue['customerId']>;
   notifications: FormControl<ReservationFormRawValue['notifications']>;
 };
 
@@ -77,9 +76,6 @@ export class ReservationFormService {
       }),
       reservationCode: new FormControl(reservationRawValue.reservationCode, {
         validators: [Validators.required, Validators.pattern('^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$')],
-      }),
-      customerId: new FormControl(reservationRawValue.customerId, {
-        validators: [Validators.required],
       }),
       customerId: new FormControl(reservationRawValue.customerId),
       notifications: new FormControl(reservationRawValue.notifications),

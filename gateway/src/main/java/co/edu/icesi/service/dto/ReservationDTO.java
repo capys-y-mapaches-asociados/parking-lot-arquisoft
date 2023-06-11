@@ -36,8 +36,6 @@ public class ReservationDTO implements Serializable {
 
     private CustomerDTO customerId;
 
-    private CustomerDTO customerId;
-
     private NotificationDTO notifications;
 
     public Long getId() {
@@ -104,14 +102,6 @@ public class ReservationDTO implements Serializable {
         this.customerId = customerId;
     }
 
-    public CustomerDTO getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(CustomerDTO customerId) {
-        this.customerId = customerId;
-    }
-
     public NotificationDTO getNotifications() {
         return notifications;
     }
@@ -152,7 +142,6 @@ public class ReservationDTO implements Serializable {
             ", endTime='" + getEndTime() + "'" +
             ", status='" + getStatus() + "'" +
             ", reservationCode='" + getReservationCode() + "'" +
-            ", customerId=" + getCustomerId() +
             ", customerId=" + getCustomerId() +
             ", notifications=" + getNotifications() +
             "}";

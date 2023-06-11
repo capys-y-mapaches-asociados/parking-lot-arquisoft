@@ -25,7 +25,6 @@ describe('ParkingSpot Form Service', () => {
             spotType: expect.any(Object),
             spotVehicle: expect.any(Object),
             parkingLotId: expect.any(Object),
-            parkingLotId: expect.any(Object),
           })
         );
       });
@@ -40,7 +39,6 @@ describe('ParkingSpot Form Service', () => {
             status: expect.any(Object),
             spotType: expect.any(Object),
             spotVehicle: expect.any(Object),
-            parkingLotId: expect.any(Object),
             parkingLotId: expect.any(Object),
           })
         );

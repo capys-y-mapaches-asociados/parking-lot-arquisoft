@@ -104,12 +104,6 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="customerId.id">
-            <div class="d-flex">
-              <span jhiTranslate="gatewayApp.reservation.customerId">Customer Id</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col" jhiSortBy="notifications.id">
             <div class="d-flex">
               <span jhiTranslate="gatewayApp.reservation.notifications">Notifications</span>
@@ -130,11 +124,6 @@
           <td>{{ reservation.endTime | formatMediumDatetime }}</td>
           <td jhiTranslate="{{ 'gatewayApp.ReservationStatus.' + reservation.status }}">{{ reservation.status }}</td>
           <td>{{ reservation.reservationCode }}</td>
-          <td>
-            <div *ngIf="reservation.customerId">
-              <a [routerLink]="['/customer', reservation.customerId.id, 'view']">{{ reservation.customerId.id }}</a>
-            </div>
-          </td>
           <td>
             <div *ngIf="reservation.customerId">
               <a [routerLink]="['/customer', reservation.customerId.id, 'view']">{{ reservation.customerId.id }}</a>

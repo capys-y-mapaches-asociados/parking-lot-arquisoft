@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
-import co.edu.icesi.domain.Customer;
 import co.edu.icesi.domain.Reservation;
 import co.edu.icesi.domain.enumeration.ReservationStatus;
 import co.edu.icesi.repository.EntityManager;
@@ -101,10 +100,6 @@ class ReservationResourceIT {
             .endTime(DEFAULT_END_TIME)
             .status(DEFAULT_STATUS)
             .reservationCode(DEFAULT_RESERVATION_CODE);
-        // Add required entity
-        Customer customer;
-        customer = em.insert(CustomerResourceIT.createEntity(em)).block();
-        reservation.setCustomerId(customer);
         return reservation;
     }
 
@@ -122,10 +117,6 @@ class ReservationResourceIT {
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
             .reservationCode(UPDATED_RESERVATION_CODE);
-        // Add required entity
-        Customer customer;
-        customer = em.insert(CustomerResourceIT.createUpdatedEntity(em)).block();
-        reservation.setCustomerId(customer);
         return reservation;
     }
 
@@ -135,7 +126,6 @@ class ReservationResourceIT {
         } catch (Exception e) {
             // It can fail, if other entities are still referring this - it will be removed later.
         }
-        CustomerResourceIT.deleteEntities(em);
     }
 
     @AfterEach

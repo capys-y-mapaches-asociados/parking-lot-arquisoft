@@ -23,7 +23,6 @@ type ParkingSpotFormGroupContent = {
   spotType: FormControl<IParkingSpot['spotType']>;
   spotVehicle: FormControl<IParkingSpot['spotVehicle']>;
   parkingLotId: FormControl<IParkingSpot['parkingLotId']>;
-  parkingLotId: FormControl<IParkingSpot['parkingLotId']>;
 };
 
 export type ParkingSpotFormGroup = FormGroup<ParkingSpotFormGroupContent>;
@@ -53,9 +52,6 @@ export class ParkingSpotFormService {
         validators: [Validators.required],
       }),
       spotVehicle: new FormControl(parkingSpotRawValue.spotVehicle, {
-        validators: [Validators.required],
-      }),
-      parkingLotId: new FormControl(parkingSpotRawValue.parkingLotId, {
         validators: [Validators.required],
       }),
       parkingLotId: new FormControl(parkingSpotRawValue.parkingLotId, {

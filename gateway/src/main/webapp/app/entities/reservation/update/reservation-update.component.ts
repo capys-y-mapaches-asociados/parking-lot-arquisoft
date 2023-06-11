@@ -90,7 +90,6 @@ export class ReservationUpdateComponent implements OnInit {
 
     this.customersSharedCollection = this.customerService.addCustomerToCollectionIfMissing<ICustomer>(
       this.customersSharedCollection,
-      reservation.customerId,
       reservation.customerId
     );
     this.notificationsSharedCollection = this.notificationService.addNotificationToCollectionIfMissing<INotification>(
@@ -105,11 +104,7 @@ export class ReservationUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<ICustomer[]>) => res.body ?? []))
       .pipe(
         map((customers: ICustomer[]) =>
-          this.customerService.addCustomerToCollectionIfMissing<ICustomer>(
-            customers,
-            this.reservation?.customerId,
-            this.reservation?.customerId
-          )
+          this.customerService.addCustomerToCollectionIfMissing<ICustomer>(customers, this.reservation?.customerId)
         )
       )
       .subscribe((customers: ICustomer[]) => (this.customersSharedCollection = customers));

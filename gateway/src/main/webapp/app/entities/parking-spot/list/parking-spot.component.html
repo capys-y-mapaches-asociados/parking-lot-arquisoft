@@ -92,12 +92,6 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="parkingLotId.id">
-            <div class="d-flex">
-              <span jhiTranslate="gatewayApp.parkingSpot.parkingLotId">Parking Lot Id</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -110,11 +104,6 @@
           <td jhiTranslate="{{ 'gatewayApp.ParkingSpotStatus.' + parkingSpot.status }}">{{ parkingSpot.status }}</td>
           <td jhiTranslate="{{ 'gatewayApp.ParkingSpotType.' + parkingSpot.spotType }}">{{ parkingSpot.spotType }}</td>
           <td jhiTranslate="{{ 'gatewayApp.ParkingSpotVehicle.' + parkingSpot.spotVehicle }}">{{ parkingSpot.spotVehicle }}</td>
-          <td>
-            <div *ngIf="parkingSpot.parkingLotId">
-              <a [routerLink]="['/parking-lot', parkingSpot.parkingLotId.id, 'view']">{{ parkingSpot.parkingLotId.id }}</a>
-            </div>
-          </td>
           <td>
             <div *ngIf="parkingSpot.parkingLotId">
               <a [routerLink]="['/parking-lot', parkingSpot.parkingLotId.id, 'view']">{{ parkingSpot.parkingLotId.id }}</a>

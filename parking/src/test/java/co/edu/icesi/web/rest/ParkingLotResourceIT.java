@@ -82,8 +82,6 @@ class ParkingLotResourceIT {
         }
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
-        parkingLot.getParkingSpots().add(parkingSpot);
-        // Add required entity
         Barrier barrier;
         if (TestUtil.findAll(em, Barrier.class).isEmpty()) {
             barrier = BarrierResourceIT.createEntity(em);
@@ -113,8 +111,6 @@ class ParkingLotResourceIT {
         } else {
             parkingSpot = TestUtil.findAll(em, ParkingSpot.class).get(0);
         }
-        parkingLot.getParkingSpots().add(parkingSpot);
-        // Add required entity
         parkingLot.getParkingSpots().add(parkingSpot);
         // Add required entity
         Barrier barrier;

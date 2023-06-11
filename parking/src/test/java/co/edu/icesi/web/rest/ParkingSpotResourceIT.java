@@ -90,8 +90,6 @@ class ParkingSpotResourceIT {
             parkingLot = TestUtil.findAll(em, ParkingLot.class).get(0);
         }
         parkingSpot.setParkingLotId(parkingLot);
-        // Add required entity
-        parkingSpot.setParkingLotId(parkingLot);
         return parkingSpot;
     }
 
@@ -116,8 +114,6 @@ class ParkingSpotResourceIT {
         } else {
             parkingLot = TestUtil.findAll(em, ParkingLot.class).get(0);
         }
-        parkingSpot.setParkingLotId(parkingLot);
-        // Add required entity
         parkingSpot.setParkingLotId(parkingLot);
         return parkingSpot;
     }

@@ -49,16 +49,7 @@ public class ParkingSpot implements Serializable {
 
     @ManyToOne(optional = false)
     @NotNull
-    @ManyToOne(optional = false)
-    @NotNull
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
-    private ParkingLot parkingLotId;
-
-    @ManyToOne(optional = false)
-    @NotNull
-    @ManyToOne(optional = false)
-    @NotNull
-    @JsonIgnoreProperties(value = { "parkingSpots", "parkingSpots", "barriers" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parkingSpots", "barriers" }, allowSetters = true)
     private ParkingLot parkingLotId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -126,19 +117,6 @@ public class ParkingSpot implements Serializable {
 
     public void setSpotVehicle(ParkingSpotVehicle spotVehicle) {
         this.spotVehicle = spotVehicle;
-    }
-
-    public ParkingLot getParkingLotId() {
-        return this.parkingLotId;
-    }
-
-    public void setParkingLotId(ParkingLot parkingLot) {
-        this.parkingLotId = parkingLot;
-    }
-
-    public ParkingSpot parkingLotId(ParkingLot parkingLot) {
-        this.setParkingLotId(parkingLot);
-        return this;
     }
 
     public ParkingLot getParkingLotId() {

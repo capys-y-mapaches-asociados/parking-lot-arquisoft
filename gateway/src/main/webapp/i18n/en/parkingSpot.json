@@ -23,7 +23,6 @@
       "status": "Status",
       "spotType": "Spot Type",
       "spotVehicle": "Spot Vehicle",
-      "parkingLotId": "Parking Lot Id",
       "parkingLotId": "Parking Lot Id"
     }
   }
