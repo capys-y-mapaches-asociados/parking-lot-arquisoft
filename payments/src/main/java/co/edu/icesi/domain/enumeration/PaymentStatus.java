@@ -5,6 +5,7 @@ package co.edu.icesi.domain.enumeration;
  */
 public enum PaymentStatus {
     PENDING,
+    PLACED,
     RECEIVED,
     REFUNDED,
 }

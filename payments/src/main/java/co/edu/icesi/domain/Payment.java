@@ -3,7 +3,6 @@ package co.edu.icesi.domain;
 import co.edu.icesi.domain.enumeration.PaymentMethod;
 import co.edu.icesi.domain.enumeration.PaymentStatus;
 import java.io.Serializable;
-import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -28,10 +27,10 @@ public class Payment implements Serializable {
 
     @NotNull
     @Column(name = "customer_id", nullable = false)
-    private UUID customerId;
+    private Integer customerId;
 
     @Column(name = "reservation_id", unique = true)
-    private UUID reservationID;
+    private Integer reservationID;
 
     @NotNull
     @DecimalMax(value = "1000.00")
@@ -63,29 +62,29 @@ public class Payment implements Serializable {
         this.id = id;
     }
 
-    public UUID getCustomerId() {
+    public Integer getCustomerId() {
         return this.customerId;
     }
 
-    public Payment customerId(UUID customerId) {
+    public Payment customerId(Integer customerId) {
         this.setCustomerId(customerId);
         return this;
     }
 
-    public void setCustomerId(UUID customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public UUID getReservationID() {
+    public Integer getReservationID() {
         return this.reservationID;
     }
 
-    public Payment reservationID(UUID reservationID) {
+    public Payment reservationID(Integer reservationID) {
         this.setReservationID(reservationID);
         return this;
     }
 
-    public void setReservationID(UUID reservationID) {
+    public void setReservationID(Integer reservationID) {
         this.reservationID = reservationID;
     }
 
@@ -152,8 +151,8 @@ public class Payment implements Serializable {
     public String toString() {
         return "Payment{" +
             "id=" + getId() +
-            ", customerId='" + getCustomerId() + "'" +
-            ", reservationID='" + getReservationID() + "'" +
+            ", customerId=" + getCustomerId() +
+            ", reservationID=" + getReservationID() +
             ", amount=" + getAmount() +
             ", paymentStatus='" + getPaymentStatus() + "'" +
             ", paymentMethod='" + getPaymentMethod() + "'" +

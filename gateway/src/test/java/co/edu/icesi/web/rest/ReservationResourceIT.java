@@ -3,7 +3,6 @@ package co.edu.icesi.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.Reservation;
@@ -17,7 +16,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +34,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WithMockUser
 class ReservationResourceIT {
 
-    private static final UUID DEFAULT_PARKING_SPOT_ID = UUID.randomUUID();
-    private static final UUID UPDATED_PARKING_SPOT_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_TICKET_ID = 1;
+    private static final Integer UPDATED_TICKET_ID = 2;
 
     private static final Instant DEFAULT_START_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_START_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -79,7 +77,7 @@ class ReservationResourceIT {
      */
     public static Reservation createEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .parkingSpotId(DEFAULT_PARKING_SPOT_ID)
+            .ticketId(DEFAULT_TICKET_ID)
             .startTime(DEFAULT_START_TIME)
             .endTime(DEFAULT_END_TIME)
             .status(DEFAULT_STATUS)
@@ -95,7 +93,7 @@ class ReservationResourceIT {
      */
     public static Reservation createUpdatedEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -114,11 +112,6 @@ class ReservationResourceIT {
     @AfterEach
     public void cleanup() {
         deleteEntities(em);
-    }
-
-    @BeforeEach
-    public void setupCsrf() {
-        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     @BeforeEach
@@ -145,7 +138,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeCreate + 1);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(DEFAULT_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -176,10 +169,10 @@ class ReservationResourceIT {
     }
 
     @Test
-    void checkParkingSpotIdIsRequired() throws Exception {
+    void checkTicketIdIsRequired() throws Exception {
         int databaseSizeBeforeTest = reservationRepository.findAll().collectList().block().size();
         // set the field null
-        reservation.setParkingSpotId(null);
+        reservation.setTicketId(null);
 
         // Create the Reservation, which fails.
         ReservationDTO reservationDTO = reservationMapper.toDto(reservation);
@@ -309,7 +302,7 @@ class ReservationResourceIT {
         assertThat(reservationList).isNotNull();
         assertThat(reservationList).hasSize(1);
         Reservation testReservation = reservationList.get(0);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(DEFAULT_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -334,8 +327,8 @@ class ReservationResourceIT {
             .expectBody()
             .jsonPath("$.[*].id")
             .value(hasItem(reservation.getId().intValue()))
-            .jsonPath("$.[*].parkingSpotId")
-            .value(hasItem(DEFAULT_PARKING_SPOT_ID.toString()))
+            .jsonPath("$.[*].ticketId")
+            .value(hasItem(DEFAULT_TICKET_ID))
             .jsonPath("$.[*].startTime")
             .value(hasItem(DEFAULT_START_TIME.toString()))
             .jsonPath("$.[*].endTime")
@@ -364,8 +357,8 @@ class ReservationResourceIT {
             .expectBody()
             .jsonPath("$.id")
             .value(is(reservation.getId().intValue()))
-            .jsonPath("$.parkingSpotId")
-            .value(is(DEFAULT_PARKING_SPOT_ID.toString()))
+            .jsonPath("$.ticketId")
+            .value(is(DEFAULT_TICKET_ID))
             .jsonPath("$.startTime")
             .value(is(DEFAULT_START_TIME.toString()))
             .jsonPath("$.endTime")
@@ -398,7 +391,7 @@ class ReservationResourceIT {
         // Update the reservation
         Reservation updatedReservation = reservationRepository.findById(reservation.getId()).block();
         updatedReservation
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -418,7 +411,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -505,7 +498,7 @@ class ReservationResourceIT {
         Reservation partialUpdatedReservation = new Reservation();
         partialUpdatedReservation.setId(reservation.getId());
 
-        partialUpdatedReservation.parkingSpotId(UPDATED_PARKING_SPOT_ID).endTime(UPDATED_END_TIME);
+        partialUpdatedReservation.ticketId(UPDATED_TICKET_ID).endTime(UPDATED_END_TIME);
 
         webTestClient
             .patch()
@@ -520,7 +513,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -539,7 +532,7 @@ class ReservationResourceIT {
         partialUpdatedReservation.setId(reservation.getId());
 
         partialUpdatedReservation
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -558,7 +551,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll().collectList().block();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(UPDATED_STATUS);

@@ -30,7 +30,7 @@ describe('Ticket e2e test', () => {
     cy.authenticatedRequest({
       method: 'POST',
       url: '/api/parking-spots',
-      body: {"number":7194,"status":"RESERVED","spotType":"HANDICAPPED","spotVehicle":"E_CAR"},
+      body: {"number":7195,"status":"RESERVED","spotType":"HANDICAPPED","spotVehicle":"E_CAR"},
     }).then(({ body }) => {
       parkingSpot = body;
     });

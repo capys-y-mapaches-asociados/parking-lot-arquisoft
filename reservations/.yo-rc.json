@@ -2,7 +2,7 @@
   "generator-jhipster": {
     "applicationIndex": 2,
     "applicationType": "microservice",
-    "authenticationType": "oauth2",
+    "authenticationType": "jwt",
     "baseName": "reservations",
     "blueprints": [],
     "buildTool": "maven",

@@ -8,8 +8,8 @@
   "entityTableName": "reservation",
   "fields": [
     {
-      "fieldName": "parkingSpotId",
-      "fieldType": "UUID",
+      "fieldName": "ticketId",
+      "fieldType": "Integer",
       "fieldValidateRules": ["required"]
     },
     {

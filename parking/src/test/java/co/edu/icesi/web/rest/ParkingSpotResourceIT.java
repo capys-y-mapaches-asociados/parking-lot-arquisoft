@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,8 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ParkingSpotResourceIT {
 
-    private static final Integer DEFAULT_NUMBER = 13000;
-    private static final Integer UPDATED_NUMBER = 12999;
+    private static final Integer DEFAULT_NUMBER = 1;
+    private static final Integer UPDATED_NUMBER = 2;
 
     private static final ParkingSpotStatus DEFAULT_STATUS = ParkingSpotStatus.OCCUPIED;
     private static final ParkingSpotStatus UPDATED_STATUS = ParkingSpotStatus.AVAILABLE;
@@ -131,10 +130,7 @@ class ParkingSpotResourceIT {
         ParkingSpotDTO parkingSpotDTO = parkingSpotMapper.toDto(parkingSpot);
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isCreated());
 
@@ -160,10 +156,7 @@ class ParkingSpotResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -184,10 +177,7 @@ class ParkingSpotResourceIT {
 
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -207,10 +197,7 @@ class ParkingSpotResourceIT {
 
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -230,10 +217,7 @@ class ParkingSpotResourceIT {
 
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -253,10 +237,7 @@ class ParkingSpotResourceIT {
 
         restParkingSpotMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -325,7 +306,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, parkingSpotDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
@@ -354,7 +334,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, parkingSpotDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
@@ -378,7 +357,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
@@ -400,12 +378,7 @@ class ParkingSpotResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restParkingSpotMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ParkingSpot in the database
@@ -430,7 +403,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedParkingSpot.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingSpot))
             )
@@ -467,7 +439,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedParkingSpot.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingSpot))
             )
@@ -496,7 +467,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, parkingSpotDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
@@ -520,7 +490,6 @@ class ParkingSpotResourceIT {
         restParkingSpotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
@@ -543,10 +512,7 @@ class ParkingSpotResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restParkingSpotMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(parkingSpotDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -565,7 +531,7 @@ class ParkingSpotResourceIT {
 
         // Delete the parkingSpot
         restParkingSpotMockMvc
-            .perform(delete(ENTITY_API_URL_ID, parkingSpot.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, parkingSpot.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

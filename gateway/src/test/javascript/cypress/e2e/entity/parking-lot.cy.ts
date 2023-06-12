@@ -31,7 +31,7 @@ describe('ParkingLot e2e test', () => {
     cy.authenticatedRequest({
       method: 'POST',
       url: '/api/parking-spots',
-      body: {"number":6249,"status":"RESERVED","spotType":"LOADING","spotVehicle":"CARGO_LARGE"},
+      body: {"number":6250,"status":"RESERVED","spotType":"MATERNITY","spotVehicle":"CARGO_LARGE"},
     }).then(({ body }) => {
       parkingSpot = body;
     });

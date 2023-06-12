@@ -3,8 +3,8 @@ import { PaymentMethod } from 'app/entities/enumerations/payment-method.model';
 
 export interface IPayment {
   id: number;
-  customerId?: string | null;
-  reservationID?: string | null;
+  customerId?: number | null;
+  reservationID?: number | null;
   amount?: number | null;
   paymentStatus?: PaymentStatus | null;
   paymentMethod?: PaymentMethod | null;

@@ -7,6 +7,4 @@ public enum ParkingSpotType {
     REGULAR,
     HANDICAPPED,
     MATERNITY,
-    LOADING,
-    EMERGENCY,
 }

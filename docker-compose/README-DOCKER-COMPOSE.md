@@ -22,5 +22,3 @@ Launch all your infrastructure by running: `docker-compose up -d`.
 - payments's postgresql database
 
 ### Additional Services:
-
-- [Keycloak server](http://localhost:9080)

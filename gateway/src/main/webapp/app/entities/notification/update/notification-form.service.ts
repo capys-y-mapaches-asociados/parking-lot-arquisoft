@@ -33,7 +33,6 @@ type NotificationFormGroupContent = {
   id: FormControl<NotificationFormRawValue['id'] | NewNotification['id']>;
   message: FormControl<NotificationFormRawValue['message']>;
   sentAt: FormControl<NotificationFormRawValue['sentAt']>;
-  recipientId: FormControl<NotificationFormRawValue['recipientId']>;
 };
 
 export type NotificationFormGroup = FormGroup<NotificationFormGroupContent>;
@@ -54,12 +53,9 @@ export class NotificationFormService {
         }
       ),
       message: new FormControl(notificationRawValue.message, {
-        validators: [Validators.maxLength(1000)],
+        validators: [Validators.required, Validators.minLength(100), Validators.maxLength(1000)],
       }),
       sentAt: new FormControl(notificationRawValue.sentAt, {
-        validators: [Validators.required],
-      }),
-      recipientId: new FormControl(notificationRawValue.recipientId, {
         validators: [Validators.required],
       }),
     });

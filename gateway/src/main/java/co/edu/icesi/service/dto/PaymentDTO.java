@@ -4,7 +4,6 @@ import co.edu.icesi.domain.enumeration.PaymentMethod;
 import co.edu.icesi.domain.enumeration.PaymentStatus;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -16,9 +15,9 @@ public class PaymentDTO implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
-    private UUID customerId;
+    private Integer customerId;
 
-    private UUID reservationID;
+    private Integer reservationID;
 
     @NotNull(message = "must not be null")
     @DecimalMax(value = "1000.00")
@@ -38,19 +37,19 @@ public class PaymentDTO implements Serializable {
         this.id = id;
     }
 
-    public UUID getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(UUID customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public UUID getReservationID() {
+    public Integer getReservationID() {
         return reservationID;
     }
 
-    public void setReservationID(UUID reservationID) {
+    public void setReservationID(Integer reservationID) {
         this.reservationID = reservationID;
     }
 
@@ -104,8 +103,8 @@ public class PaymentDTO implements Serializable {
     public String toString() {
         return "PaymentDTO{" +
             "id=" + getId() +
-            ", customerId='" + getCustomerId() + "'" +
-            ", reservationID='" + getReservationID() + "'" +
+            ", customerId=" + getCustomerId() +
+            ", reservationID=" + getReservationID() +
             ", amount=" + getAmount() +
             ", paymentStatus='" + getPaymentStatus() + "'" +
             ", paymentMethod='" + getPaymentMethod() + "'" +

@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -135,12 +134,7 @@ class TicketResourceIT {
         // Create the Ticket
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Ticket in the database
@@ -165,12 +159,7 @@ class TicketResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Ticket in the database
@@ -189,12 +178,7 @@ class TicketResourceIT {
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
 
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         List<Ticket> ticketList = ticketRepository.findAll();
@@ -212,12 +196,7 @@ class TicketResourceIT {
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
 
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         List<Ticket> ticketList = ticketRepository.findAll();
@@ -235,12 +214,7 @@ class TicketResourceIT {
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
 
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         List<Ticket> ticketList = ticketRepository.findAll();
@@ -258,12 +232,7 @@ class TicketResourceIT {
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
 
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         List<Ticket> ticketList = ticketRepository.findAll();
@@ -281,12 +250,7 @@ class TicketResourceIT {
         TicketDTO ticketDTO = ticketMapper.toDto(ticket);
 
         restTicketMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isBadRequest());
 
         List<Ticket> ticketList = ticketRepository.findAll();
@@ -361,7 +325,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, ticketDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
@@ -391,7 +354,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, ticketDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
@@ -415,7 +377,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
@@ -437,12 +398,7 @@ class TicketResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTicketMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(ticketDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Ticket in the database
@@ -467,7 +423,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTicket.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTicket))
             )
@@ -506,7 +461,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTicket.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTicket))
             )
@@ -536,7 +490,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, ticketDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
@@ -560,7 +513,6 @@ class TicketResourceIT {
         restTicketMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
@@ -583,10 +535,7 @@ class TicketResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTicketMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(ticketDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(ticketDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -605,7 +554,7 @@ class TicketResourceIT {
 
         // Delete the ticket
         restTicketMockMvc
-            .perform(delete(ENTITY_API_URL_ID, ticket.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, ticket.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

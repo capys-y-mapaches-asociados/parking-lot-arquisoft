@@ -14,7 +14,7 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="parking_spot_id" type="${uuidType}">
+            <column name="ticket_id" type="integer">
                 <constraints nullable="false" />
             </column>
             <column name="start_time" type="${datetimeType}">
@@ -58,7 +58,7 @@
                   tableName="reservation"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="parking_spot_id" type="${uuidType}"/>
+            <column name="ticket_id" type="numeric"/>
             <column name="start_time" type="date"/>
             <column name="end_time" type="date"/>
             <column name="status" type="string"/>

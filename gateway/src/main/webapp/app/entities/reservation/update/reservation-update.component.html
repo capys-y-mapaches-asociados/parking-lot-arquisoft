@@ -18,26 +18,22 @@
         </div>
 
         <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.reservation.parkingSpotId" for="field_parkingSpotId">Parking Spot Id</label>
-          <input
-            type="text"
-            class="form-control"
-            name="parkingSpotId"
-            id="field_parkingSpotId"
-            data-cy="parkingSpotId"
-            formControlName="parkingSpotId"
-          />
-          <div
-            *ngIf="
-              editForm.get('parkingSpotId')!.invalid && (editForm.get('parkingSpotId')!.dirty || editForm.get('parkingSpotId')!.touched)
-            "
-          >
+          <label class="form-label" jhiTranslate="gatewayApp.reservation.ticketId" for="field_ticketId">Ticket Id</label>
+          <input type="number" class="form-control" name="ticketId" id="field_ticketId" data-cy="ticketId" formControlName="ticketId" />
+          <div *ngIf="editForm.get('ticketId')!.invalid && (editForm.get('ticketId')!.dirty || editForm.get('ticketId')!.touched)">
             <small
               class="form-text text-danger"
-              *ngIf="editForm.get('parkingSpotId')?.errors?.required"
+              *ngIf="editForm.get('ticketId')?.errors?.required"
               jhiTranslate="entity.validation.required"
             >
               This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('ticketId')?.errors?.number"
+              jhiTranslate="entity.validation.number"
+            >
+              This field should be a number.
             </small>
           </div>
         </div>

@@ -50,12 +50,6 @@
               <fa-icon class="p-1" icon="sort"></fa-icon>
             </div>
           </th>
-          <th scope="col" jhiSortBy="recipientId">
-            <div class="d-flex">
-              <span jhiTranslate="gatewayApp.notification.recipientId">Recipient Id</span>
-              <fa-icon class="p-1" icon="sort"></fa-icon>
-            </div>
-          </th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -66,7 +60,6 @@
           </td>
           <td>{{ notification.message }}</td>
           <td>{{ notification.sentAt | formatMediumDatetime }}</td>
-          <td>{{ notification.recipientId }}</td>
           <td class="text-end">
             <div class="btn-group">
               <button

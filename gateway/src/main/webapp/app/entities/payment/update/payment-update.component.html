@@ -16,7 +16,7 @@
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gatewayApp.payment.customerId" for="field_customerId">Customer Id</label>
           <input
-            type="text"
+            type="number"
             class="form-control"
             name="customerId"
             id="field_customerId"
@@ -31,13 +31,20 @@
             >
               This field is required.
             </small>
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('customerId')?.errors?.number"
+              jhiTranslate="entity.validation.number"
+            >
+              This field should be a number.
+            </small>
           </div>
         </div>
 
         <div class="row mb-3">
           <label class="form-label" jhiTranslate="gatewayApp.payment.reservationID" for="field_reservationID">Reservation ID</label>
           <input
-            type="text"
+            type="number"
             class="form-control"
             name="reservationID"
             id="field_reservationID"
@@ -48,7 +55,15 @@
             *ngIf="
               editForm.get('reservationID')!.invalid && (editForm.get('reservationID')!.dirty || editForm.get('reservationID')!.touched)
             "
-          ></div>
+          >
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('reservationID')?.errors?.number"
+              jhiTranslate="entity.validation.number"
+            >
+              This field should be a number.
+            </small>
+          </div>
         </div>
 
         <div class="row mb-3">

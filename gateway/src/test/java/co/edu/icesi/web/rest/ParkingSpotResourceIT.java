@@ -3,7 +3,6 @@ package co.edu.icesi.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.ParkingLot;
@@ -36,8 +35,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WithMockUser
 class ParkingSpotResourceIT {
 
-    private static final Integer DEFAULT_NUMBER = 13000;
-    private static final Integer UPDATED_NUMBER = 12999;
+    private static final Integer DEFAULT_NUMBER = 1;
+    private static final Integer UPDATED_NUMBER = 2;
 
     private static final ParkingSpotStatus DEFAULT_STATUS = ParkingSpotStatus.OCCUPIED;
     private static final ParkingSpotStatus UPDATED_STATUS = ParkingSpotStatus.AVAILABLE;
@@ -118,11 +117,6 @@ class ParkingSpotResourceIT {
     @AfterEach
     public void cleanup() {
         deleteEntities(em);
-    }
-
-    @BeforeEach
-    public void setupCsrf() {
-        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     @BeforeEach

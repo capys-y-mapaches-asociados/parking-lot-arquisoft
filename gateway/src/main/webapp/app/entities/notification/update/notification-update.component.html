@@ -23,6 +23,21 @@
           <div *ngIf="editForm.get('message')!.invalid && (editForm.get('message')!.dirty || editForm.get('message')!.touched)">
             <small
               class="form-text text-danger"
+              *ngIf="editForm.get('message')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('message')?.errors?.minlength"
+              jhiTranslate="entity.validation.minlength"
+              [translateValues]="{ min: 100 }"
+            >
+              This field is required to be at least 100 characters.
+            </small>
+            <small
+              class="form-text text-danger"
               *ngIf="editForm.get('message')?.errors?.maxlength"
               jhiTranslate="entity.validation.maxlength"
               [translateValues]="{ max: 1000 }"
@@ -55,27 +70,6 @@
               jhiTranslate="entity.validation.datetimelocal"
             >
               This field should be a date and time.
-            </small>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <label class="form-label" jhiTranslate="gatewayApp.notification.recipientId" for="field_recipientId">Recipient Id</label>
-          <input
-            type="text"
-            class="form-control"
-            name="recipientId"
-            id="field_recipientId"
-            data-cy="recipientId"
-            formControlName="recipientId"
-          />
-          <div *ngIf="editForm.get('recipientId')!.invalid && (editForm.get('recipientId')!.dirty || editForm.get('recipientId')!.touched)">
-            <small
-              class="form-text text-danger"
-              *ngIf="editForm.get('recipientId')?.errors?.required"
-              jhiTranslate="entity.validation.required"
-            >
-              This field is required.
             </small>
           </div>
         </div>

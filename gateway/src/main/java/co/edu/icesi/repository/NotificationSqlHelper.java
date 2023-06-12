@@ -13,7 +13,6 @@ public class NotificationSqlHelper {
         columns.add(Column.aliased("id", table, columnPrefix + "_id"));
         columns.add(Column.aliased("message", table, columnPrefix + "_message"));
         columns.add(Column.aliased("sent_at", table, columnPrefix + "_sent_at"));
-        columns.add(Column.aliased("recipient_id", table, columnPrefix + "_recipient_id"));
 
         return columns;
     }

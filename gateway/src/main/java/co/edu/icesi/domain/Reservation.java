@@ -4,7 +4,6 @@ import co.edu.icesi.domain.enumeration.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -25,8 +24,8 @@ public class Reservation implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
-    @Column("parking_spot_id")
-    private UUID parkingSpotId;
+    @Column("ticket_id")
+    private Integer ticketId;
 
     @NotNull(message = "must not be null")
     @Column("start_time")
@@ -74,17 +73,17 @@ public class Reservation implements Serializable {
         this.id = id;
     }
 
-    public UUID getParkingSpotId() {
-        return this.parkingSpotId;
+    public Integer getTicketId() {
+        return this.ticketId;
     }
 
-    public Reservation parkingSpotId(UUID parkingSpotId) {
-        this.setParkingSpotId(parkingSpotId);
+    public Reservation ticketId(Integer ticketId) {
+        this.setTicketId(ticketId);
         return this;
     }
 
-    public void setParkingSpotId(UUID parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
+    public void setTicketId(Integer ticketId) {
+        this.ticketId = ticketId;
     }
 
     public Instant getStartTime() {
@@ -207,7 +206,7 @@ public class Reservation implements Serializable {
     public String toString() {
         return "Reservation{" +
             "id=" + getId() +
-            ", parkingSpotId='" + getParkingSpotId() + "'" +
+            ", ticketId=" + getTicketId() +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +
             ", status='" + getStatus() + "'" +

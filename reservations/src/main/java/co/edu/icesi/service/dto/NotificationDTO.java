@@ -3,7 +3,6 @@ package co.edu.icesi.service.dto;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -14,14 +13,12 @@ public class NotificationDTO implements Serializable {
 
     private Long id;
 
-    @Size(max = 1000)
+    @NotNull
+    @Size(min = 100, max = 1000)
     private String message;
 
     @NotNull
     private Instant sentAt;
-
-    @NotNull
-    private UUID recipientId;
 
     public Long getId() {
         return id;
@@ -45,14 +42,6 @@ public class NotificationDTO implements Serializable {
 
     public void setSentAt(Instant sentAt) {
         this.sentAt = sentAt;
-    }
-
-    public UUID getRecipientId() {
-        return recipientId;
-    }
-
-    public void setRecipientId(UUID recipientId) {
-        this.recipientId = recipientId;
     }
 
     @Override
@@ -83,7 +72,6 @@ public class NotificationDTO implements Serializable {
             "id=" + getId() +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
-            ", recipientId='" + getRecipientId() + "'" +
             "}";
     }
 }

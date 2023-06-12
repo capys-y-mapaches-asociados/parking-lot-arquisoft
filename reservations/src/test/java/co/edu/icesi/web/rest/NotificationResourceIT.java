@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,7 +15,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,14 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class NotificationResourceIT {
 
-    private static final String DEFAULT_MESSAGE = "AAAAAAAAAA";
-    private static final String UPDATED_MESSAGE = "BBBBBBBBBB";
+    private static final String DEFAULT_MESSAGE =
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    private static final String UPDATED_MESSAGE =
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
 
     private static final Instant DEFAULT_SENT_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_SENT_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final UUID DEFAULT_RECIPIENT_ID = UUID.randomUUID();
-    private static final UUID UPDATED_RECIPIENT_ID = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/notifications";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -72,7 +69,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createEntity(EntityManager em) {
-        Notification notification = new Notification().message(DEFAULT_MESSAGE).sentAt(DEFAULT_SENT_AT).recipientId(DEFAULT_RECIPIENT_ID);
+        Notification notification = new Notification().message(DEFAULT_MESSAGE).sentAt(DEFAULT_SENT_AT);
         // Add required entity
         Reservation reservation;
         if (TestUtil.findAll(em, Reservation.class).isEmpty()) {
@@ -93,7 +90,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createUpdatedEntity(EntityManager em) {
-        Notification notification = new Notification().message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        Notification notification = new Notification().message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
         // Add required entity
         Reservation reservation;
         if (TestUtil.findAll(em, Reservation.class).isEmpty()) {
@@ -120,10 +117,7 @@ class NotificationResourceIT {
         NotificationDTO notificationDTO = notificationMapper.toDto(notification);
         restNotificationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
             .andExpect(status().isCreated());
 
@@ -133,7 +127,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(DEFAULT_RECIPIENT_ID);
     }
 
     @Test
@@ -148,16 +141,33 @@ class NotificationResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restNotificationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Notification in the database
         List<Notification> notificationList = notificationRepository.findAll();
         assertThat(notificationList).hasSize(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    @Transactional
+    void checkMessageIsRequired() throws Exception {
+        int databaseSizeBeforeTest = notificationRepository.findAll().size();
+        // set the field null
+        notification.setMessage(null);
+
+        // Create the Notification, which fails.
+        NotificationDTO notificationDTO = notificationMapper.toDto(notification);
+
+        restNotificationMockMvc
+            .perform(
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(notificationDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertThat(notificationList).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
@@ -172,33 +182,7 @@ class NotificationResourceIT {
 
         restNotificationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
-            )
-            .andExpect(status().isBadRequest());
-
-        List<Notification> notificationList = notificationRepository.findAll();
-        assertThat(notificationList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkRecipientIdIsRequired() throws Exception {
-        int databaseSizeBeforeTest = notificationRepository.findAll().size();
-        // set the field null
-        notification.setRecipientId(null);
-
-        // Create the Notification, which fails.
-        NotificationDTO notificationDTO = notificationMapper.toDto(notification);
-
-        restNotificationMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -219,8 +203,7 @@ class NotificationResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(notification.getId().intValue())))
             .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE)))
-            .andExpect(jsonPath("$.[*].sentAt").value(hasItem(DEFAULT_SENT_AT.toString())))
-            .andExpect(jsonPath("$.[*].recipientId").value(hasItem(DEFAULT_RECIPIENT_ID.toString())));
+            .andExpect(jsonPath("$.[*].sentAt").value(hasItem(DEFAULT_SENT_AT.toString())));
     }
 
     @Test
@@ -236,8 +219,7 @@ class NotificationResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(notification.getId().intValue()))
             .andExpect(jsonPath("$.message").value(DEFAULT_MESSAGE))
-            .andExpect(jsonPath("$.sentAt").value(DEFAULT_SENT_AT.toString()))
-            .andExpect(jsonPath("$.recipientId").value(DEFAULT_RECIPIENT_ID.toString()));
+            .andExpect(jsonPath("$.sentAt").value(DEFAULT_SENT_AT.toString()));
     }
 
     @Test
@@ -259,13 +241,12 @@ class NotificationResourceIT {
         Notification updatedNotification = notificationRepository.findById(notification.getId()).get();
         // Disconnect from session so that the updates on updatedNotification are not directly saved in db
         em.detach(updatedNotification);
-        updatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        updatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
         NotificationDTO notificationDTO = notificationMapper.toDto(updatedNotification);
 
         restNotificationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, notificationDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -277,7 +258,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test
@@ -293,7 +273,6 @@ class NotificationResourceIT {
         restNotificationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, notificationDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -317,7 +296,6 @@ class NotificationResourceIT {
         restNotificationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -340,10 +318,7 @@ class NotificationResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restNotificationMockMvc
             .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
+                put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -364,12 +339,9 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification.recipientId(UPDATED_RECIPIENT_ID);
-
         restNotificationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedNotification.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedNotification))
             )
@@ -381,7 +353,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test
@@ -396,12 +367,11 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        partialUpdatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
 
         restNotificationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedNotification.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedNotification))
             )
@@ -413,7 +383,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test
@@ -429,7 +398,6 @@ class NotificationResourceIT {
         restNotificationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, notificationDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -453,7 +421,6 @@ class NotificationResourceIT {
         restNotificationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -477,7 +444,6 @@ class NotificationResourceIT {
         restNotificationMockMvc
             .perform(
                 patch(ENTITY_API_URL)
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(notificationDTO))
             )
@@ -498,7 +464,7 @@ class NotificationResourceIT {
 
         // Delete the notification
         restNotificationMockMvc
-            .perform(delete(ENTITY_API_URL_ID, notification.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, notification.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

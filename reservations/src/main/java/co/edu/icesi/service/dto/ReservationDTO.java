@@ -4,7 +4,6 @@ import co.edu.icesi.domain.enumeration.ReservationStatus;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import javax.validation.constraints.*;
 
 /**
@@ -16,7 +15,7 @@ public class ReservationDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private UUID parkingSpotId;
+    private Integer ticketId;
 
     @NotNull
     private Instant startTime;
@@ -43,12 +42,12 @@ public class ReservationDTO implements Serializable {
         this.id = id;
     }
 
-    public UUID getParkingSpotId() {
-        return parkingSpotId;
+    public Integer getTicketId() {
+        return ticketId;
     }
 
-    public void setParkingSpotId(UUID parkingSpotId) {
-        this.parkingSpotId = parkingSpotId;
+    public void setTicketId(Integer ticketId) {
+        this.ticketId = ticketId;
     }
 
     public Instant getStartTime() {
@@ -125,7 +124,7 @@ public class ReservationDTO implements Serializable {
     public String toString() {
         return "ReservationDTO{" +
             "id=" + getId() +
-            ", parkingSpotId='" + getParkingSpotId() + "'" +
+            ", ticketId=" + getTicketId() +
             ", startTime='" + getStartTime() + "'" +
             ", endTime='" + getEndTime() + "'" +
             ", status='" + getStatus() + "'" +

@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -137,12 +136,7 @@ class ParkingLotResourceIT {
         // Create the ParkingLot
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
         restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isCreated());
 
         // Validate the ParkingLot in the database
@@ -165,12 +159,7 @@ class ParkingLotResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the ParkingLot in the database
@@ -189,12 +178,7 @@ class ParkingLotResourceIT {
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isBadRequest());
 
         List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
@@ -212,12 +196,7 @@ class ParkingLotResourceIT {
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isBadRequest());
 
         List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
@@ -235,12 +214,7 @@ class ParkingLotResourceIT {
         ParkingLotDTO parkingLotDTO = parkingLotMapper.toDto(parkingLot);
 
         restParkingLotMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isBadRequest());
 
         List<ParkingLot> parkingLotList = parkingLotRepository.findAll();
@@ -306,7 +280,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
@@ -334,7 +307,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
@@ -358,7 +330,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
@@ -380,12 +351,7 @@ class ParkingLotResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restParkingLotMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(parkingLotDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ParkingLot in the database
@@ -410,7 +376,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
             )
@@ -442,7 +407,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedParkingLot.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedParkingLot))
             )
@@ -470,7 +434,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, parkingLotDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
@@ -494,7 +457,6 @@ class ParkingLotResourceIT {
         restParkingLotMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
@@ -517,10 +479,7 @@ class ParkingLotResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restParkingLotMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(parkingLotDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -539,7 +498,7 @@ class ParkingLotResourceIT {
 
         // Delete the parkingLot
         restParkingLotMockMvc
-            .perform(delete(ENTITY_API_URL_ID, parkingLot.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, parkingLot.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import javax.validation.constraints.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -25,17 +24,14 @@ public class Notification implements Serializable {
     @Column("id")
     private Long id;
 
-    @Size(max = 1000)
+    @NotNull(message = "must not be null")
+    @Size(min = 100, max = 1000)
     @Column("message")
     private String message;
 
     @NotNull(message = "must not be null")
     @Column("sent_at")
     private Instant sentAt;
-
-    @NotNull(message = "must not be null")
-    @Column("recipient_id")
-    private UUID recipientId;
 
     @Transient
     @JsonIgnoreProperties(value = { "customerId", "notifications" }, allowSetters = true)
@@ -80,19 +76,6 @@ public class Notification implements Serializable {
 
     public void setSentAt(Instant sentAt) {
         this.sentAt = sentAt;
-    }
-
-    public UUID getRecipientId() {
-        return this.recipientId;
-    }
-
-    public Notification recipientId(UUID recipientId) {
-        this.setRecipientId(recipientId);
-        return this;
-    }
-
-    public void setRecipientId(UUID recipientId) {
-        this.recipientId = recipientId;
     }
 
     public Set<Reservation> getReservationIds() {
@@ -152,7 +135,6 @@ public class Notification implements Serializable {
             "id=" + getId() +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
-            ", recipientId='" + getRecipientId() + "'" +
             "}";
     }
 }

@@ -8,12 +8,12 @@
   "fields": [
     {
       "fieldName": "customerId",
-      "fieldType": "UUID",
+      "fieldType": "Integer",
       "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "reservationID",
-      "fieldType": "UUID",
+      "fieldType": "Integer",
       "fieldValidateRules": ["unique"]
     },
     {
@@ -26,7 +26,7 @@
       "fieldName": "paymentStatus",
       "fieldType": "PaymentStatus",
       "fieldValidateRules": ["required"],
-      "fieldValues": "PENDING,RECEIVED,REFUNDED"
+      "fieldValues": "PENDING,PLACED,RECEIVED,REFUNDED"
     },
     {
       "fieldName": "paymentMethod",

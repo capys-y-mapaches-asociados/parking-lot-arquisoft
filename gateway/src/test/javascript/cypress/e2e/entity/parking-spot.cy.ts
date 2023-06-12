@@ -216,7 +216,7 @@ describe('ParkingSpot e2e test', () => {
 
       cy.get(`[data-cy="spotType"]`).select('HANDICAPPED');
 
-      cy.get(`[data-cy="spotVehicle"]`).select('CAR_LARGE');
+      cy.get(`[data-cy="spotVehicle"]`).select('CARGO');
 
       cy.get(`[data-cy="parkingLotId"]`).select(1);
 

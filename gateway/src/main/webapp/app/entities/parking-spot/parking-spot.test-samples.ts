@@ -6,7 +6,7 @@ import { IParkingSpot, NewParkingSpot } from './parking-spot.model';
 
 export const sampleWithRequiredData: IParkingSpot = {
   id: 12186,
-  number: 2939,
+  number: 2940,
   status: ParkingSpotStatus['OCCUPIED'],
   spotType: ParkingSpotType['REGULAR'],
   spotVehicle: ParkingSpotVehicle['E_CAR'],
@@ -14,24 +14,24 @@ export const sampleWithRequiredData: IParkingSpot = {
 
 export const sampleWithPartialData: IParkingSpot = {
   id: 24222,
-  number: 11405,
+  number: 11406,
   status: ParkingSpotStatus['AVAILABLE'],
-  spotType: ParkingSpotType['EMERGENCY'],
-  spotVehicle: ParkingSpotVehicle['E_SCOOTER'],
+  spotType: ParkingSpotType['MATERNITY'],
+  spotVehicle: ParkingSpotVehicle['BIKE'],
 };
 
 export const sampleWithFullData: IParkingSpot = {
   id: 98159,
   number: 3073,
   status: ParkingSpotStatus['OUT_OF_SERVICE'],
-  spotType: ParkingSpotType['EMERGENCY'],
+  spotType: ParkingSpotType['MATERNITY'],
   spotVehicle: ParkingSpotVehicle['CARGO'],
 };
 
 export const sampleWithNewData: NewParkingSpot = {
-  number: 7494,
+  number: 7495,
   status: ParkingSpotStatus['OUT_OF_SERVICE'],
-  spotType: ParkingSpotType['LOADING'],
+  spotType: ParkingSpotType['HANDICAPPED'],
   spotVehicle: ParkingSpotVehicle['CARGO'],
   id: null,
 };
