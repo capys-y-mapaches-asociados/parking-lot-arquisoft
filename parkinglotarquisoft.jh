@@ -4,7 +4,7 @@ application {
     baseName gateway,
     applicationType gateway,
     packageName co.edu.icesi,
-    authenticationType oauth2,
+    authenticationType jwt,
     prodDatabaseType postgresql,
     clientFramework angularX,
     buildTool maven,
@@ -20,7 +20,7 @@ application {
     baseName parking,
     applicationType microservice,
     packageName co.edu.icesi,
-    authenticationType oauth2,
+    authenticationType jwt,
     prodDatabaseType postgresql,
     devDatabaseType h2Disk,
 	buildTool maven,
@@ -38,7 +38,7 @@ application {
     baseName reservations,
     applicationType microservice,
     packageName co.edu.icesi,
-    authenticationType oauth2,
+    authenticationType jwt,
     prodDatabaseType postgresql,
     devDatabaseType h2Disk,
     buildTool maven,
@@ -56,7 +56,7 @@ application {
     baseName payments,
     applicationType microservice,
     packageName co.edu.icesi,
-    authenticationType oauth2,
+    authenticationType jwt,
     prodDatabaseType postgresql,
     devDatabaseType h2Disk,
     buildTool maven,
@@ -69,6 +69,12 @@ application {
   service * with serviceImpl
 }
 
+entity ParkingLot {
+  name String required unique, 
+  location String required minlength(12), 
+  capacity Integer required max(13000)
+}
+
 enum ParkingSpotStatus {
   OCCUPIED,
   AVAILABLE,
@@ -79,9 +85,7 @@ enum ParkingSpotStatus {
 enum ParkingSpotType {
   REGULAR,
   HANDICAPPED,
-  MATERNITY,
-  LOADING,
-  EMERGENCY
+  MATERNITY
 }
 
 enum ParkingSpotVehicle {
@@ -89,22 +93,14 @@ enum ParkingSpotVehicle {
   CARGO,
   CAR_LARGE,
   CAR,
-  E_CAR_LARGE,
   E_CAR,
   MOTORBIKE,
-  BIKE,
-  E_SCOOTER
-}
-
-entity ParkingLot {
-  name String required unique, 
-  location String required minlength(12), 
-  capacity Integer required max(13000)
+  BIKE
 }
 
 entity ParkingSpot {
-  number Integer required max(13000), 
-  status ParkingSpotStatus required, 
+  number Integer required min(1) max(13000),
+  status ParkingSpotStatus required,
   spotType ParkingSpotType required, 
   spotVehicle ParkingSpotVehicle required
 }
@@ -117,7 +113,7 @@ enum ReservationStatus {
 }
 
 entity Reservation {
-  parkingSpotId UUID required, 
+  ticketId Integer required,
   startTime Instant required, 
   endTime Instant required, 
   status ReservationStatus required, 
@@ -132,9 +128,8 @@ entity Customer {
 }
 
 entity Notification {
-  message String maxlength(1000), 
-  sentAt Instant required, 
-  recipientId UUID required
+  message String minlength(100) maxlength(1000) required,
+  sentAt Instant required,
 }
 
 enum TicketStatus {
@@ -170,6 +165,7 @@ entity Barrier {
 
 enum PaymentStatus {
   PENDING,
+  PLACED,
   RECEIVED,
   REFUNDED
 }
@@ -181,8 +177,8 @@ enum PaymentMethod {
 }
 
 entity Payment {
-  customerId UUID required,
-  reservationID UUID unique,
+  customerId Integer required,
+  reservationID Integer unique,
   amount Float required max(1000.00), 
   paymentStatus PaymentStatus required, 
   paymentMethod PaymentMethod required
