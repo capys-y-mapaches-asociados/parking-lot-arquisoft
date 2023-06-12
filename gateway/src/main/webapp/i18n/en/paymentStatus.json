@@ -1,0 +1,11 @@
+{
+  "gatewayApp": {
+    "PaymentStatus": {
+      "null": "",
+      "PENDING": "PENDING",
+      "PLACED": "PLACED",
+      "RECEIVED": "RECEIVED",
+      "REFUNDED": "REFUNDED"
+    }
+  }
+}

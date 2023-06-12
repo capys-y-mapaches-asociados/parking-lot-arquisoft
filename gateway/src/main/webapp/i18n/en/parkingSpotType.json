@@ -1,0 +1,10 @@
+{
+  "gatewayApp": {
+    "ParkingSpotType": {
+      "null": "",
+      "REGULAR": "REGULAR",
+      "HANDICAPPED": "HANDICAPPED",
+      "MATERNITY": "MATERNITY"
+    }
+  }
+}
