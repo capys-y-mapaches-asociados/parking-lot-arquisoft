@@ -1,0 +1,9 @@
+{
+  "gatewayApp": {
+    "TicketStatus": {
+      "null": "",
+      "ACTIVE": "ACTIVE",
+      "EXPIRED": "EXPIRED"
+    }
+  }
+}

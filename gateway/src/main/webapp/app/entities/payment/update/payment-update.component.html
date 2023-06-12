@@ -1,0 +1,166 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-payment-heading" data-cy="PaymentCreateUpdateHeading" jhiTranslate="gatewayApp.payment.home.createOrEditLabel">
+        Create or edit a Payment
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        <div class="row mb-3" *ngIf="editForm.controls.id.value !== null">
+          <label class="form-label" jhiTranslate="global.field.id" for="field_id">ID</label>
+          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gatewayApp.payment.customerId" for="field_customerId">Customer Id</label>
+          <input
+            type="number"
+            class="form-control"
+            name="customerId"
+            id="field_customerId"
+            data-cy="customerId"
+            formControlName="customerId"
+          />
+          <div *ngIf="editForm.get('customerId')!.invalid && (editForm.get('customerId')!.dirty || editForm.get('customerId')!.touched)">
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('customerId')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('customerId')?.errors?.number"
+              jhiTranslate="entity.validation.number"
+            >
+              This field should be a number.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gatewayApp.payment.reservationID" for="field_reservationID">Reservation ID</label>
+          <input
+            type="number"
+            class="form-control"
+            name="reservationID"
+            id="field_reservationID"
+            data-cy="reservationID"
+            formControlName="reservationID"
+          />
+          <div
+            *ngIf="
+              editForm.get('reservationID')!.invalid && (editForm.get('reservationID')!.dirty || editForm.get('reservationID')!.touched)
+            "
+          >
+            <small
+              class="form-text text-danger"
+              [hidden]="!editForm.get('reservationID')?.errors?.number"
+              jhiTranslate="entity.validation.number"
+            >
+              This field should be a number.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gatewayApp.payment.amount" for="field_amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+          <div *ngIf="editForm.get('amount')!.invalid && (editForm.get('amount')!.dirty || editForm.get('amount')!.touched)">
+            <small class="form-text text-danger" *ngIf="editForm.get('amount')?.errors?.required" jhiTranslate="entity.validation.required">
+              This field is required.
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('amount')?.errors?.max"
+              jhiTranslate="entity.validation.max"
+              [translateValues]="{ max: 1000.0 }"
+            >
+              This field cannot be more than 1000.00.
+            </small>
+            <small class="form-text text-danger" [hidden]="!editForm.get('amount')?.errors?.number" jhiTranslate="entity.validation.number">
+              This field should be a number.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gatewayApp.payment.paymentStatus" for="field_paymentStatus">Payment Status</label>
+          <select
+            class="form-control"
+            name="paymentStatus"
+            formControlName="paymentStatus"
+            id="field_paymentStatus"
+            data-cy="paymentStatus"
+          >
+            <option [ngValue]="null">{{ 'gatewayApp.PaymentStatus.null' | translate }}</option>
+            <option *ngFor="let paymentStatus of paymentStatusValues" [value]="paymentStatus">
+              {{ 'gatewayApp.PaymentStatus.' + paymentStatus | translate }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              editForm.get('paymentStatus')!.invalid && (editForm.get('paymentStatus')!.dirty || editForm.get('paymentStatus')!.touched)
+            "
+          >
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('paymentStatus')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="gatewayApp.payment.paymentMethod" for="field_paymentMethod">Payment Method</label>
+          <select
+            class="form-control"
+            name="paymentMethod"
+            formControlName="paymentMethod"
+            id="field_paymentMethod"
+            data-cy="paymentMethod"
+          >
+            <option [ngValue]="null">{{ 'gatewayApp.PaymentMethod.null' | translate }}</option>
+            <option *ngFor="let paymentMethod of paymentMethodValues" [value]="paymentMethod">
+              {{ 'gatewayApp.PaymentMethod.' + paymentMethod | translate }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              editForm.get('paymentMethod')!.invalid && (editForm.get('paymentMethod')!.dirty || editForm.get('paymentMethod')!.touched)
+            "
+          >
+            <small
+              class="form-text text-danger"
+              *ngIf="editForm.get('paymentMethod')?.errors?.required"
+              jhiTranslate="entity.validation.required"
+            >
+              This field is required.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

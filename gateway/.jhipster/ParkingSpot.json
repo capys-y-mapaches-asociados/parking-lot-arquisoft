@@ -1,0 +1,50 @@
+{
+  "applications": ["gateway", "parking"],
+  "changelogDate": "20230612224717",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "parking_spot",
+  "fields": [
+    {
+      "fieldName": "number",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "13000",
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "ParkingSpotStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "OCCUPIED,AVAILABLE,RESERVED,OUT_OF_SERVICE"
+    },
+    {
+      "fieldName": "spotType",
+      "fieldType": "ParkingSpotType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "REGULAR,HANDICAPPED,MATERNITY"
+    },
+    {
+      "fieldName": "spotVehicle",
+      "fieldType": "ParkingSpotVehicle",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CARGO_LARGE,CARGO,CAR_LARGE,CAR,E_CAR,MOTORBIKE,BIKE"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "ParkingSpot",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "parkingLot",
+      "otherEntityRelationshipName": "parkingSpots",
+      "relationshipName": "parkingLotId",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "service": "serviceImpl"
+}

@@ -1,0 +1,28 @@
+{
+  "gatewayApp": {
+    "parkingLot": {
+      "home": {
+        "title": "Parking Lots",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Parking Lot",
+        "createOrEditLabel": "Create or edit a Parking Lot",
+        "notFound": "No Parking Lots found"
+      },
+      "created": "A new Parking Lot is created with identifier {{ param }}",
+      "updated": "A Parking Lot is updated with identifier {{ param }}",
+      "deleted": "A Parking Lot is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Parking Lot {{ id }}?"
+      },
+      "detail": {
+        "title": "Parking Lot"
+      },
+      "id": "ID",
+      "name": "Name",
+      "location": "Location",
+      "capacity": "Capacity",
+      "parkingSpots": "Parking Spots",
+      "barriers": "Barriers"
+    }
+  }
+}

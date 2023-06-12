@@ -1,0 +1,42 @@
+{
+  "applications": ["gateway", "parking"],
+  "changelogDate": "20230612224417",
+  "databaseType": "sql",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "barrier",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "BarrierType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ENTRY,EXIT"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "BarrierStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "OPEN,CLOSED,DISABLED,MAINTENANCE"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Barrier",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "parkingLot",
+      "otherEntityRelationshipName": "barriers",
+      "relationshipName": "parkingLot",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "service": "serviceImpl"
+}
