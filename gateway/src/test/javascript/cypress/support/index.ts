@@ -17,4 +17,3 @@ import './commands';
 import './navbar';
 import './entity';
 import './management';
-import './oauth2';

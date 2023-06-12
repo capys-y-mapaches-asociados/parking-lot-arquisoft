@@ -14,10 +14,10 @@
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="customer_id" type="${uuidType}">
+            <column name="customer_id" type="integer">
                 <constraints nullable="false" />
             </column>
-            <column name="reservation_id" type="${uuidType}">
+            <column name="reservation_id" type="integer">
                 <constraints nullable="true" unique="true" uniqueConstraintName="ux_payment__reservation_id" />
             </column>
             <column name="amount" type="${floatType}">
@@ -50,8 +50,8 @@
                   tableName="payment"
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
-            <column name="customer_id" type="${uuidType}"/>
-            <column name="reservation_id" type="${uuidType}"/>
+            <column name="customer_id" type="numeric"/>
+            <column name="reservation_id" type="numeric"/>
             <column name="amount" type="numeric"/>
             <column name="payment_status" type="string"/>
             <column name="payment_method" type="string"/>

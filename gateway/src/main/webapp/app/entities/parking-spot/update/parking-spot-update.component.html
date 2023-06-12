@@ -26,6 +26,14 @@
             </small>
             <small
               class="form-text text-danger"
+              *ngIf="editForm.get('number')?.errors?.min"
+              jhiTranslate="entity.validation.min"
+              [translateValues]="{ min: 1 }"
+            >
+              This field should be at least 1.
+            </small>
+            <small
+              class="form-text text-danger"
               *ngIf="editForm.get('number')?.errors?.max"
               jhiTranslate="entity.validation.max"
               [translateValues]="{ max: 13000 }"

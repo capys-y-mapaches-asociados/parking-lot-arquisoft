@@ -3,7 +3,6 @@ package co.edu.icesi.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.Notification;
@@ -17,7 +16,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,14 +34,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WithMockUser
 class NotificationResourceIT {
 
-    private static final String DEFAULT_MESSAGE = "AAAAAAAAAA";
-    private static final String UPDATED_MESSAGE = "BBBBBBBBBB";
+    private static final String DEFAULT_MESSAGE =
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    private static final String UPDATED_MESSAGE =
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
 
     private static final Instant DEFAULT_SENT_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_SENT_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final UUID DEFAULT_RECIPIENT_ID = UUID.randomUUID();
-    private static final UUID UPDATED_RECIPIENT_ID = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/notifications";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -72,7 +69,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createEntity(EntityManager em) {
-        Notification notification = new Notification().message(DEFAULT_MESSAGE).sentAt(DEFAULT_SENT_AT).recipientId(DEFAULT_RECIPIENT_ID);
+        Notification notification = new Notification().message(DEFAULT_MESSAGE).sentAt(DEFAULT_SENT_AT);
         // Add required entity
         Reservation reservation;
         reservation = em.insert(ReservationResourceIT.createEntity(em)).block();
@@ -87,7 +84,7 @@ class NotificationResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Notification createUpdatedEntity(EntityManager em) {
-        Notification notification = new Notification().message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        Notification notification = new Notification().message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
         // Add required entity
         Reservation reservation;
         reservation = em.insert(ReservationResourceIT.createUpdatedEntity(em)).block();
@@ -107,11 +104,6 @@ class NotificationResourceIT {
     @AfterEach
     public void cleanup() {
         deleteEntities(em);
-    }
-
-    @BeforeEach
-    public void setupCsrf() {
-        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     @BeforeEach
@@ -140,7 +132,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(DEFAULT_RECIPIENT_ID);
     }
 
     @Test
@@ -167,10 +158,10 @@ class NotificationResourceIT {
     }
 
     @Test
-    void checkSentAtIsRequired() throws Exception {
+    void checkMessageIsRequired() throws Exception {
         int databaseSizeBeforeTest = notificationRepository.findAll().collectList().block().size();
         // set the field null
-        notification.setSentAt(null);
+        notification.setMessage(null);
 
         // Create the Notification, which fails.
         NotificationDTO notificationDTO = notificationMapper.toDto(notification);
@@ -189,10 +180,10 @@ class NotificationResourceIT {
     }
 
     @Test
-    void checkRecipientIdIsRequired() throws Exception {
+    void checkSentAtIsRequired() throws Exception {
         int databaseSizeBeforeTest = notificationRepository.findAll().collectList().block().size();
         // set the field null
-        notification.setRecipientId(null);
+        notification.setSentAt(null);
 
         // Create the Notification, which fails.
         NotificationDTO notificationDTO = notificationMapper.toDto(notification);
@@ -236,7 +227,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(0);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(DEFAULT_RECIPIENT_ID);
     }
 
     @Test
@@ -260,9 +250,7 @@ class NotificationResourceIT {
             .jsonPath("$.[*].message")
             .value(hasItem(DEFAULT_MESSAGE))
             .jsonPath("$.[*].sentAt")
-            .value(hasItem(DEFAULT_SENT_AT.toString()))
-            .jsonPath("$.[*].recipientId")
-            .value(hasItem(DEFAULT_RECIPIENT_ID.toString()));
+            .value(hasItem(DEFAULT_SENT_AT.toString()));
     }
 
     @Test
@@ -286,9 +274,7 @@ class NotificationResourceIT {
             .jsonPath("$.message")
             .value(is(DEFAULT_MESSAGE))
             .jsonPath("$.sentAt")
-            .value(is(DEFAULT_SENT_AT.toString()))
-            .jsonPath("$.recipientId")
-            .value(is(DEFAULT_RECIPIENT_ID.toString()));
+            .value(is(DEFAULT_SENT_AT.toString()));
     }
 
     @Test
@@ -312,7 +298,7 @@ class NotificationResourceIT {
 
         // Update the notification
         Notification updatedNotification = notificationRepository.findById(notification.getId()).block();
-        updatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        updatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
         NotificationDTO notificationDTO = notificationMapper.toDto(updatedNotification);
 
         webTestClient
@@ -330,7 +316,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test
@@ -413,8 +398,6 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification.recipientId(UPDATED_RECIPIENT_ID);
-
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, partialUpdatedNotification.getId())
@@ -430,7 +413,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(DEFAULT_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(DEFAULT_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test
@@ -444,7 +426,7 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT).recipientId(UPDATED_RECIPIENT_ID);
+        partialUpdatedNotification.message(UPDATED_MESSAGE).sentAt(UPDATED_SENT_AT);
 
         webTestClient
             .patch()
@@ -461,7 +443,6 @@ class NotificationResourceIT {
         Notification testNotification = notificationList.get(notificationList.size() - 1);
         assertThat(testNotification.getMessage()).isEqualTo(UPDATED_MESSAGE);
         assertThat(testNotification.getSentAt()).isEqualTo(UPDATED_SENT_AT);
-        assertThat(testNotification.getRecipientId()).isEqualTo(UPDATED_RECIPIENT_ID);
     }
 
     @Test

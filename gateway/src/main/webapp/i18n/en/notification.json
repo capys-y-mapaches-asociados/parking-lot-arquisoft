@@ -20,7 +20,6 @@
       "id": "ID",
       "message": "Message",
       "sentAt": "Sent At",
-      "recipientId": "Recipient Id",
       "reservationId": "Reservation Id"
     }
   }

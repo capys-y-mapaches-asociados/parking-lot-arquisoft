@@ -15,12 +15,7 @@ describe('Payment e2e test', () => {
   const paymentPageUrlPattern = new RegExp('/payment(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const paymentSample = {
-    customerId: '05d365ae-e3bb-46e2-8097-a746bb302023',
-    amount: 639,
-    paymentStatus: 'RECEIVED',
-    paymentMethod: 'CASH',
-  };
+  const paymentSample = { customerId: 78598, amount: 200, paymentStatus: 'PLACED', paymentMethod: 'CASH' };
 
   let payment;
 
@@ -162,19 +157,13 @@ describe('Payment e2e test', () => {
     });
 
     it('should create an instance of Payment', () => {
-      cy.get(`[data-cy="customerId"]`)
-        .type('f29a4c36-505d-482e-8ee0-a9d50e45e495')
-        .invoke('val')
-        .should('match', new RegExp('f29a4c36-505d-482e-8ee0-a9d50e45e495'));
+      cy.get(`[data-cy="customerId"]`).type('94762').should('have.value', '94762');
 
-      cy.get(`[data-cy="reservationID"]`)
-        .type('624b35cd-1c96-4f56-9177-c5117ce3ba56')
-        .invoke('val')
-        .should('match', new RegExp('624b35cd-1c96-4f56-9177-c5117ce3ba56'));
+      cy.get(`[data-cy="reservationID"]`).type('12957').should('have.value', '12957');
 
-      cy.get(`[data-cy="amount"]`).type('741').should('have.value', '741');
+      cy.get(`[data-cy="amount"]`).type('580').should('have.value', '580');
 
-      cy.get(`[data-cy="paymentStatus"]`).select('REFUNDED');
+      cy.get(`[data-cy="paymentStatus"]`).select('RECEIVED');
 
       cy.get(`[data-cy="paymentMethod"]`).select('CARD');
 

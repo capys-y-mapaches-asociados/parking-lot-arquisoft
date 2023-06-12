@@ -10,8 +10,9 @@
     {
       "fieldName": "number",
       "fieldType": "Integer",
-      "fieldValidateRules": ["required", "max"],
-      "fieldValidateRulesMax": "13000"
+      "fieldValidateRules": ["required", "min", "max"],
+      "fieldValidateRulesMax": "13000",
+      "fieldValidateRulesMin": "1"
     },
     {
       "fieldName": "status",
@@ -23,13 +24,13 @@
       "fieldName": "spotType",
       "fieldType": "ParkingSpotType",
       "fieldValidateRules": ["required"],
-      "fieldValues": "REGULAR,HANDICAPPED,MATERNITY,LOADING,EMERGENCY"
+      "fieldValues": "REGULAR,HANDICAPPED,MATERNITY"
     },
     {
       "fieldName": "spotVehicle",
       "fieldType": "ParkingSpotVehicle",
       "fieldValidateRules": ["required"],
-      "fieldValues": "CARGO_LARGE,CARGO,CAR_LARGE,CAR,E_CAR_LARGE,E_CAR,MOTORBIKE,BIKE,E_SCOOTER"
+      "fieldValues": "CARGO_LARGE,CARGO,CAR_LARGE,CAR,E_CAR,MOTORBIKE,BIKE"
     }
   ],
   "fluentMethods": true,

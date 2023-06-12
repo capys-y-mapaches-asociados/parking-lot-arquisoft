@@ -16,6 +16,7 @@ public class ParkingSpotDTO implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @Min(value = 1)
     @Max(value = 13000)
     private Integer number;
 

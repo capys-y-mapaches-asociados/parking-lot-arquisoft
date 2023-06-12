@@ -15,7 +15,10 @@ describe('Notification e2e test', () => {
   const notificationPageUrlPattern = new RegExp('/notification(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const notificationSample = { sentAt: '2023-06-10T23:19:33.352Z', recipientId: 'e657f5e7-b001-4d38-82b2-bbfb0615efb2' };
+  const notificationSample = {
+    message: 'mint ivoryXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    sentAt: '2023-06-11T02:18:05.623Z',
+  };
 
   let notification;
   let reservation;
@@ -30,11 +33,11 @@ describe('Notification e2e test', () => {
       method: 'POST',
       url: '/api/reservations',
       body: {
-        parkingSpotId: '0584800e-4c13-419c-9812-363ddbf3a584',
-        startTime: '2023-06-10T10:59:11.706Z',
-        endTime: '2023-06-10T07:51:30.336Z',
+        ticketId: 923,
+        startTime: '2023-06-10T22:16:42.489Z',
+        endTime: '2023-06-10T17:40:31.444Z',
         status: 'ACTIVE',
-        reservationCode: 'WM-F{10, 14}',
+        reservationCode: 'BA-8{10, 14}',
       },
     }).then(({ body }) => {
       reservation = body;
@@ -197,14 +200,11 @@ describe('Notification e2e test', () => {
     });
 
     it('should create an instance of Notification', () => {
-      cy.get(`[data-cy="message"]`).type('Buckinghamshire Gorgeous indexing').should('have.value', 'Buckinghamshire Gorgeous indexing');
+      cy.get(`[data-cy="message"]`)
+        .type('Buckinghamshire Gorgeous indexingXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        .should('have.value', 'Buckinghamshire Gorgeous indexingXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 
       cy.get(`[data-cy="sentAt"]`).type('2023-06-10T10:58').blur().should('have.value', '2023-06-10T10:58');
-
-      cy.get(`[data-cy="recipientId"]`)
-        .type('93333c42-b449-4829-91f7-d591a05dc390')
-        .invoke('val')
-        .should('match', new RegExp('93333c42-b449-4829-91f7-d591a05dc390'));
 
       cy.get(`[data-cy="reservationId"]`).select([0]);
 

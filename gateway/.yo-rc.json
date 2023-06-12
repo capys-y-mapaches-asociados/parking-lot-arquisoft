@@ -2,7 +2,7 @@
   "generator-jhipster": {
     "applicationIndex": 0,
     "applicationType": "gateway",
-    "authenticationType": "oauth2",
+    "authenticationType": "jwt",
     "baseName": "gateway",
     "blueprints": [],
     "buildTool": "maven",
@@ -44,7 +44,7 @@
     "skipClient": false,
     "skipCommitHook": true,
     "skipFakeData": false,
-    "skipUserManagement": true,
+    "skipUserManagement": false,
     "testFrameworks": ["cypress"],
     "websocket": false,
     "withAdminUi": true

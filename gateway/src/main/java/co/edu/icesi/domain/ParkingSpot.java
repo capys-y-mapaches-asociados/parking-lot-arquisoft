@@ -25,6 +25,7 @@ public class ParkingSpot implements Serializable {
     private Long id;
 
     @NotNull(message = "must not be null")
+    @Min(value = 1)
     @Max(value = 13000)
     @Column("number")
     private Integer number;

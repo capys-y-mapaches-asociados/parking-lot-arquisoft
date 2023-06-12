@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -118,12 +117,7 @@ class BarrierResourceIT {
         // Create the Barrier
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
         restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Barrier in the database
@@ -146,12 +140,7 @@ class BarrierResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Barrier in the database
@@ -170,12 +159,7 @@ class BarrierResourceIT {
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isBadRequest());
 
         List<Barrier> barrierList = barrierRepository.findAll();
@@ -193,12 +177,7 @@ class BarrierResourceIT {
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isBadRequest());
 
         List<Barrier> barrierList = barrierRepository.findAll();
@@ -216,12 +195,7 @@ class BarrierResourceIT {
         BarrierDTO barrierDTO = barrierMapper.toDto(barrier);
 
         restBarrierMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isBadRequest());
 
         List<Barrier> barrierList = barrierRepository.findAll();
@@ -287,7 +261,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
@@ -315,7 +288,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
@@ -339,7 +311,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
@@ -361,12 +332,7 @@ class BarrierResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBarrierMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(barrierDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Barrier in the database
@@ -391,7 +357,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
             )
@@ -423,7 +388,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedBarrier.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedBarrier))
             )
@@ -451,7 +415,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, barrierDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
@@ -475,7 +438,6 @@ class BarrierResourceIT {
         restBarrierMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
@@ -498,10 +460,7 @@ class BarrierResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restBarrierMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(barrierDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(barrierDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -520,7 +479,7 @@ class BarrierResourceIT {
 
         // Delete the barrier
         restBarrierMockMvc
-            .perform(delete(ENTITY_API_URL_ID, barrier.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, barrier.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

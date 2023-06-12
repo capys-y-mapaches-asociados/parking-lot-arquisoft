@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,7 +15,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ReservationResourceIT {
 
-    private static final UUID DEFAULT_PARKING_SPOT_ID = UUID.randomUUID();
-    private static final UUID UPDATED_PARKING_SPOT_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_TICKET_ID = 1;
+    private static final Integer UPDATED_TICKET_ID = 2;
 
     private static final Instant DEFAULT_START_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_START_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -79,7 +77,7 @@ class ReservationResourceIT {
      */
     public static Reservation createEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .parkingSpotId(DEFAULT_PARKING_SPOT_ID)
+            .ticketId(DEFAULT_TICKET_ID)
             .startTime(DEFAULT_START_TIME)
             .endTime(DEFAULT_END_TIME)
             .status(DEFAULT_STATUS)
@@ -95,7 +93,7 @@ class ReservationResourceIT {
      */
     public static Reservation createUpdatedEntity(EntityManager em) {
         Reservation reservation = new Reservation()
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -116,10 +114,7 @@ class ReservationResourceIT {
         ReservationDTO reservationDTO = reservationMapper.toDto(reservation);
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isCreated());
 
@@ -127,7 +122,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll();
         assertThat(reservationList).hasSize(databaseSizeBeforeCreate + 1);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(DEFAULT_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(DEFAULT_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -146,10 +141,7 @@ class ReservationResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -160,20 +152,17 @@ class ReservationResourceIT {
 
     @Test
     @Transactional
-    void checkParkingSpotIdIsRequired() throws Exception {
+    void checkTicketIdIsRequired() throws Exception {
         int databaseSizeBeforeTest = reservationRepository.findAll().size();
         // set the field null
-        reservation.setParkingSpotId(null);
+        reservation.setTicketId(null);
 
         // Create the Reservation, which fails.
         ReservationDTO reservationDTO = reservationMapper.toDto(reservation);
 
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -193,10 +182,7 @@ class ReservationResourceIT {
 
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -216,10 +202,7 @@ class ReservationResourceIT {
 
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -239,10 +222,7 @@ class ReservationResourceIT {
 
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -262,10 +242,7 @@ class ReservationResourceIT {
 
         restReservationMockMvc
             .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -285,7 +262,7 @@ class ReservationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(reservation.getId().intValue())))
-            .andExpect(jsonPath("$.[*].parkingSpotId").value(hasItem(DEFAULT_PARKING_SPOT_ID.toString())))
+            .andExpect(jsonPath("$.[*].ticketId").value(hasItem(DEFAULT_TICKET_ID)))
             .andExpect(jsonPath("$.[*].startTime").value(hasItem(DEFAULT_START_TIME.toString())))
             .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
@@ -304,7 +281,7 @@ class ReservationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(reservation.getId().intValue()))
-            .andExpect(jsonPath("$.parkingSpotId").value(DEFAULT_PARKING_SPOT_ID.toString()))
+            .andExpect(jsonPath("$.ticketId").value(DEFAULT_TICKET_ID))
             .andExpect(jsonPath("$.startTime").value(DEFAULT_START_TIME.toString()))
             .andExpect(jsonPath("$.endTime").value(DEFAULT_END_TIME.toString()))
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
@@ -331,7 +308,7 @@ class ReservationResourceIT {
         // Disconnect from session so that the updates on updatedReservation are not directly saved in db
         em.detach(updatedReservation);
         updatedReservation
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -341,7 +318,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, reservationDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
@@ -351,7 +327,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -371,7 +347,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, reservationDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
@@ -395,7 +370,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
@@ -417,12 +391,7 @@ class ReservationResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReservationMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(reservationDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Reservation in the database
@@ -442,12 +411,11 @@ class ReservationResourceIT {
         Reservation partialUpdatedReservation = new Reservation();
         partialUpdatedReservation.setId(reservation.getId());
 
-        partialUpdatedReservation.parkingSpotId(UPDATED_PARKING_SPOT_ID).endTime(UPDATED_END_TIME);
+        partialUpdatedReservation.ticketId(UPDATED_TICKET_ID).endTime(UPDATED_END_TIME);
 
         restReservationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedReservation.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedReservation))
             )
@@ -457,7 +425,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
@@ -477,7 +445,7 @@ class ReservationResourceIT {
         partialUpdatedReservation.setId(reservation.getId());
 
         partialUpdatedReservation
-            .parkingSpotId(UPDATED_PARKING_SPOT_ID)
+            .ticketId(UPDATED_TICKET_ID)
             .startTime(UPDATED_START_TIME)
             .endTime(UPDATED_END_TIME)
             .status(UPDATED_STATUS)
@@ -486,7 +454,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedReservation.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedReservation))
             )
@@ -496,7 +463,7 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getParkingSpotId()).isEqualTo(UPDATED_PARKING_SPOT_ID);
+        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
         assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
         assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
         assertThat(testReservation.getStatus()).isEqualTo(UPDATED_STATUS);
@@ -516,7 +483,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, reservationDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
@@ -540,7 +506,6 @@ class ReservationResourceIT {
         restReservationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
@@ -563,10 +528,7 @@ class ReservationResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restReservationMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(reservationDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(reservationDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -585,7 +547,7 @@ class ReservationResourceIT {
 
         // Delete the reservation
         restReservationMockMvc
-            .perform(delete(ENTITY_API_URL_ID, reservation.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, reservation.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

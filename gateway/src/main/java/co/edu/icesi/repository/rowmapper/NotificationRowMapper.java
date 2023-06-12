@@ -3,7 +3,6 @@ package co.edu.icesi.repository.rowmapper;
 import co.edu.icesi.domain.Notification;
 import io.r2dbc.spi.Row;
 import java.time.Instant;
-import java.util.UUID;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,6 @@ public class NotificationRowMapper implements BiFunction<Row, String, Notificati
         entity.setId(converter.fromRow(row, prefix + "_id", Long.class));
         entity.setMessage(converter.fromRow(row, prefix + "_message", String.class));
         entity.setSentAt(converter.fromRow(row, prefix + "_sent_at", Instant.class));
-        entity.setRecipientId(converter.fromRow(row, prefix + "_recipient_id", UUID.class));
         return entity;
     }
 }

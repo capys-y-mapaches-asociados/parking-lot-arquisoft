@@ -4,8 +4,4 @@ export enum ParkingSpotType {
   HANDICAPPED = 'HANDICAPPED',
 
   MATERNITY = 'MATERNITY',
-
-  LOADING = 'LOADING',
-
-  EMERGENCY = 'EMERGENCY',
 }

@@ -3,7 +3,6 @@ package co.edu.icesi.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import co.edu.icesi.IntegrationTest;
 import co.edu.icesi.domain.Payment;
@@ -16,7 +15,6 @@ import co.edu.icesi.service.mapper.PaymentMapper;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,17 +33,17 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WithMockUser
 class PaymentResourceIT {
 
-    private static final UUID DEFAULT_CUSTOMER_ID = UUID.randomUUID();
-    private static final UUID UPDATED_CUSTOMER_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_CUSTOMER_ID = 1;
+    private static final Integer UPDATED_CUSTOMER_ID = 2;
 
-    private static final UUID DEFAULT_RESERVATION_ID = UUID.randomUUID();
-    private static final UUID UPDATED_RESERVATION_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_RESERVATION_ID = 1;
+    private static final Integer UPDATED_RESERVATION_ID = 2;
 
     private static final Float DEFAULT_AMOUNT = 1000.00F;
     private static final Float UPDATED_AMOUNT = 999F;
 
     private static final PaymentStatus DEFAULT_PAYMENT_STATUS = PaymentStatus.PENDING;
-    private static final PaymentStatus UPDATED_PAYMENT_STATUS = PaymentStatus.RECEIVED;
+    private static final PaymentStatus UPDATED_PAYMENT_STATUS = PaymentStatus.PLACED;
 
     private static final PaymentMethod DEFAULT_PAYMENT_METHOD = PaymentMethod.CARD;
     private static final PaymentMethod UPDATED_PAYMENT_METHOD = PaymentMethod.CASH;
@@ -113,11 +111,6 @@ class PaymentResourceIT {
     @AfterEach
     public void cleanup() {
         deleteEntities(em);
-    }
-
-    @BeforeEach
-    public void setupCsrf() {
-        webTestClient = webTestClient.mutateWith(csrf());
     }
 
     @BeforeEach
@@ -312,9 +305,9 @@ class PaymentResourceIT {
             .jsonPath("$.[*].id")
             .value(hasItem(payment.getId().intValue()))
             .jsonPath("$.[*].customerId")
-            .value(hasItem(DEFAULT_CUSTOMER_ID.toString()))
+            .value(hasItem(DEFAULT_CUSTOMER_ID))
             .jsonPath("$.[*].reservationID")
-            .value(hasItem(DEFAULT_RESERVATION_ID.toString()))
+            .value(hasItem(DEFAULT_RESERVATION_ID))
             .jsonPath("$.[*].amount")
             .value(hasItem(DEFAULT_AMOUNT.doubleValue()))
             .jsonPath("$.[*].paymentStatus")
@@ -342,9 +335,9 @@ class PaymentResourceIT {
             .jsonPath("$.id")
             .value(is(payment.getId().intValue()))
             .jsonPath("$.customerId")
-            .value(is(DEFAULT_CUSTOMER_ID.toString()))
+            .value(is(DEFAULT_CUSTOMER_ID))
             .jsonPath("$.reservationID")
-            .value(is(DEFAULT_RESERVATION_ID.toString()))
+            .value(is(DEFAULT_RESERVATION_ID))
             .jsonPath("$.amount")
             .value(is(DEFAULT_AMOUNT.doubleValue()))
             .jsonPath("$.paymentStatus")

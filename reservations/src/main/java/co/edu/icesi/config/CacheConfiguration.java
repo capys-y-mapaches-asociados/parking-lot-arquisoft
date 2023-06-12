@@ -46,12 +46,6 @@ public class CacheConfiguration {
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cm -> {
-            createCache(cm, "oAuth2Authentication");
-            createCache(cm, co.edu.icesi.repository.UserRepository.USERS_BY_LOGIN_CACHE);
-            createCache(cm, co.edu.icesi.repository.UserRepository.USERS_BY_EMAIL_CACHE);
-            createCache(cm, co.edu.icesi.domain.User.class.getName());
-            createCache(cm, co.edu.icesi.domain.Authority.class.getName());
-            createCache(cm, co.edu.icesi.domain.User.class.getName() + ".authorities");
             createCache(cm, co.edu.icesi.domain.Reservation.class.getName());
             createCache(cm, co.edu.icesi.domain.Notification.class.getName());
             createCache(cm, co.edu.icesi.domain.Notification.class.getName() + ".reservationIds");

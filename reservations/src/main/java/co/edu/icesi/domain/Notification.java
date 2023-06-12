@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -28,17 +27,14 @@ public class Notification implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Size(max = 1000)
-    @Column(name = "message", length = 1000)
+    @NotNull
+    @Size(min = 100, max = 1000)
+    @Column(name = "message", length = 1000, nullable = false)
     private String message;
 
     @NotNull
     @Column(name = "sent_at", nullable = false)
     private Instant sentAt;
-
-    @NotNull
-    @Column(name = "recipient_id", nullable = false)
-    private UUID recipientId;
 
     @OneToMany(mappedBy = "notifications")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -84,19 +80,6 @@ public class Notification implements Serializable {
 
     public void setSentAt(Instant sentAt) {
         this.sentAt = sentAt;
-    }
-
-    public UUID getRecipientId() {
-        return this.recipientId;
-    }
-
-    public Notification recipientId(UUID recipientId) {
-        this.setRecipientId(recipientId);
-        return this;
-    }
-
-    public void setRecipientId(UUID recipientId) {
-        this.recipientId = recipientId;
     }
 
     public Set<Reservation> getReservationIds() {
@@ -156,7 +139,6 @@ public class Notification implements Serializable {
             "id=" + getId() +
             ", message='" + getMessage() + "'" +
             ", sentAt='" + getSentAt() + "'" +
-            ", recipientId='" + getRecipientId() + "'" +
             "}";
     }
 }

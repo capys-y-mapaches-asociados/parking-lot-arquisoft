@@ -22,10 +22,6 @@
         <dd>
           <span>{{ notification.sentAt | formatMediumDatetime }}</span>
         </dd>
-        <dt><span jhiTranslate="gatewayApp.notification.recipientId">Recipient Id</span></dt>
-        <dd>
-          <span>{{ notification.recipientId }}</span>
-        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

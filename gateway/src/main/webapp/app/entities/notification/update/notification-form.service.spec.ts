@@ -22,7 +22,6 @@ describe('Notification Form Service', () => {
             id: expect.any(Object),
             message: expect.any(Object),
             sentAt: expect.any(Object),
-            recipientId: expect.any(Object),
           })
         );
       });
@@ -35,7 +34,6 @@ describe('Notification Form Service', () => {
             id: expect.any(Object),
             message: expect.any(Object),
             sentAt: expect.any(Object),
-            recipientId: expect.any(Object),
           })
         );
       });

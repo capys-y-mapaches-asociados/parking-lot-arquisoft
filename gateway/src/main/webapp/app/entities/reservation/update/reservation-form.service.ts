@@ -32,7 +32,7 @@ type ReservationFormDefaults = Pick<NewReservation, 'id' | 'startTime' | 'endTim
 
 type ReservationFormGroupContent = {
   id: FormControl<ReservationFormRawValue['id'] | NewReservation['id']>;
-  parkingSpotId: FormControl<ReservationFormRawValue['parkingSpotId']>;
+  ticketId: FormControl<ReservationFormRawValue['ticketId']>;
   startTime: FormControl<ReservationFormRawValue['startTime']>;
   endTime: FormControl<ReservationFormRawValue['endTime']>;
   status: FormControl<ReservationFormRawValue['status']>;
@@ -58,7 +58,7 @@ export class ReservationFormService {
           validators: [Validators.required],
         }
       ),
-      parkingSpotId: new FormControl(reservationRawValue.parkingSpotId, {
+      ticketId: new FormControl(reservationRawValue.ticketId, {
         validators: [Validators.required],
       }),
       startTime: new FormControl(reservationRawValue.startTime, {

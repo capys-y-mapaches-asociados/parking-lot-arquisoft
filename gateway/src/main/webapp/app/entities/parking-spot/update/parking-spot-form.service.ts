@@ -43,7 +43,7 @@ export class ParkingSpotFormService {
         }
       ),
       number: new FormControl(parkingSpotRawValue.number, {
-        validators: [Validators.required, Validators.max(13000)],
+        validators: [Validators.required, Validators.min(1), Validators.max(13000)],
       }),
       status: new FormControl(parkingSpotRawValue.status, {
         validators: [Validators.required],

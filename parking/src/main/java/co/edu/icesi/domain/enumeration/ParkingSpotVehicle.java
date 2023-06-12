@@ -8,9 +8,7 @@ public enum ParkingSpotVehicle {
     CARGO,
     CAR_LARGE,
     CAR,
-    E_CAR_LARGE,
     E_CAR,
     MOTORBIKE,
     BIKE,
-    E_SCOOTER,
 }

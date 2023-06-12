@@ -4,7 +4,6 @@ import co.edu.icesi.domain.Reservation;
 import co.edu.icesi.domain.enumeration.ReservationStatus;
 import io.r2dbc.spi.Row;
 import java.time.Instant;
-import java.util.UUID;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class ReservationRowMapper implements BiFunction<Row, String, Reservation
     public Reservation apply(Row row, String prefix) {
         Reservation entity = new Reservation();
         entity.setId(converter.fromRow(row, prefix + "_id", Long.class));
-        entity.setParkingSpotId(converter.fromRow(row, prefix + "_parking_spot_id", UUID.class));
+        entity.setTicketId(converter.fromRow(row, prefix + "_ticket_id", Integer.class));
         entity.setStartTime(converter.fromRow(row, prefix + "_start_time", Instant.class));
         entity.setEndTime(converter.fromRow(row, prefix + "_end_time", Instant.class));
         entity.setStatus(converter.fromRow(row, prefix + "_status", ReservationStatus.class));

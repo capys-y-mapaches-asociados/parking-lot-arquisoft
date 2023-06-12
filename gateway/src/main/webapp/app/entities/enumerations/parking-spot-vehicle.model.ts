@@ -7,13 +7,9 @@ export enum ParkingSpotVehicle {
 
   CAR = 'CAR',
 
-  E_CAR_LARGE = 'E_CAR_LARGE',
-
   E_CAR = 'E_CAR',
 
   MOTORBIKE = 'MOTORBIKE',
 
   BIKE = 'BIKE',
-
-  E_SCOOTER = 'E_SCOOTER',
 }

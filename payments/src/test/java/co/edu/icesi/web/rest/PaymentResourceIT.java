@@ -2,7 +2,6 @@ package co.edu.icesi.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -15,7 +14,6 @@ import co.edu.icesi.service.dto.PaymentDTO;
 import co.edu.icesi.service.mapper.PaymentMapper;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,17 +33,17 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class PaymentResourceIT {
 
-    private static final UUID DEFAULT_CUSTOMER_ID = UUID.randomUUID();
-    private static final UUID UPDATED_CUSTOMER_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_CUSTOMER_ID = 1;
+    private static final Integer UPDATED_CUSTOMER_ID = 2;
 
-    private static final UUID DEFAULT_RESERVATION_ID = UUID.randomUUID();
-    private static final UUID UPDATED_RESERVATION_ID = UUID.randomUUID();
+    private static final Integer DEFAULT_RESERVATION_ID = 1;
+    private static final Integer UPDATED_RESERVATION_ID = 2;
 
     private static final Float DEFAULT_AMOUNT = 1000.00F;
     private static final Float UPDATED_AMOUNT = 999F;
 
     private static final PaymentStatus DEFAULT_PAYMENT_STATUS = PaymentStatus.PENDING;
-    private static final PaymentStatus UPDATED_PAYMENT_STATUS = PaymentStatus.RECEIVED;
+    private static final PaymentStatus UPDATED_PAYMENT_STATUS = PaymentStatus.PLACED;
 
     private static final PaymentMethod DEFAULT_PAYMENT_METHOD = PaymentMethod.CARD;
     private static final PaymentMethod UPDATED_PAYMENT_METHOD = PaymentMethod.CASH;
@@ -114,12 +112,7 @@ class PaymentResourceIT {
         // Create the Payment
         PaymentDTO paymentDTO = paymentMapper.toDto(payment);
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Payment in the database
@@ -144,12 +137,7 @@ class PaymentResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Payment in the database
@@ -168,12 +156,7 @@ class PaymentResourceIT {
         PaymentDTO paymentDTO = paymentMapper.toDto(payment);
 
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isBadRequest());
 
         List<Payment> paymentList = paymentRepository.findAll();
@@ -191,12 +174,7 @@ class PaymentResourceIT {
         PaymentDTO paymentDTO = paymentMapper.toDto(payment);
 
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isBadRequest());
 
         List<Payment> paymentList = paymentRepository.findAll();
@@ -214,12 +192,7 @@ class PaymentResourceIT {
         PaymentDTO paymentDTO = paymentMapper.toDto(payment);
 
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isBadRequest());
 
         List<Payment> paymentList = paymentRepository.findAll();
@@ -237,12 +210,7 @@ class PaymentResourceIT {
         PaymentDTO paymentDTO = paymentMapper.toDto(payment);
 
         restPaymentMockMvc
-            .perform(
-                post(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isBadRequest());
 
         List<Payment> paymentList = paymentRepository.findAll();
@@ -261,8 +229,8 @@ class PaymentResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(payment.getId().intValue())))
-            .andExpect(jsonPath("$.[*].customerId").value(hasItem(DEFAULT_CUSTOMER_ID.toString())))
-            .andExpect(jsonPath("$.[*].reservationID").value(hasItem(DEFAULT_RESERVATION_ID.toString())))
+            .andExpect(jsonPath("$.[*].customerId").value(hasItem(DEFAULT_CUSTOMER_ID)))
+            .andExpect(jsonPath("$.[*].reservationID").value(hasItem(DEFAULT_RESERVATION_ID)))
             .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
             .andExpect(jsonPath("$.[*].paymentStatus").value(hasItem(DEFAULT_PAYMENT_STATUS.toString())))
             .andExpect(jsonPath("$.[*].paymentMethod").value(hasItem(DEFAULT_PAYMENT_METHOD.toString())));
@@ -280,8 +248,8 @@ class PaymentResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(payment.getId().intValue()))
-            .andExpect(jsonPath("$.customerId").value(DEFAULT_CUSTOMER_ID.toString()))
-            .andExpect(jsonPath("$.reservationID").value(DEFAULT_RESERVATION_ID.toString()))
+            .andExpect(jsonPath("$.customerId").value(DEFAULT_CUSTOMER_ID))
+            .andExpect(jsonPath("$.reservationID").value(DEFAULT_RESERVATION_ID))
             .andExpect(jsonPath("$.amount").value(DEFAULT_AMOUNT.doubleValue()))
             .andExpect(jsonPath("$.paymentStatus").value(DEFAULT_PAYMENT_STATUS.toString()))
             .andExpect(jsonPath("$.paymentMethod").value(DEFAULT_PAYMENT_METHOD.toString()));
@@ -317,7 +285,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, paymentDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
@@ -347,7 +314,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, paymentDTO.getId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
@@ -371,7 +337,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
@@ -393,12 +358,7 @@ class PaymentResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPaymentMockMvc
-            .perform(
-                put(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
-            )
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(paymentDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Payment in the database
@@ -423,7 +383,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPayment.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPayment))
             )
@@ -462,7 +421,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPayment.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPayment))
             )
@@ -492,7 +450,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, paymentDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
@@ -516,7 +473,6 @@ class PaymentResourceIT {
         restPaymentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
@@ -539,10 +495,7 @@ class PaymentResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPaymentMockMvc
             .perform(
-                patch(ENTITY_API_URL)
-                    .with(csrf())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(paymentDTO))
+                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(paymentDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -561,7 +514,7 @@ class PaymentResourceIT {
 
         // Delete the payment
         restPaymentMockMvc
-            .perform(delete(ENTITY_API_URL_ID, payment.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, payment.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item

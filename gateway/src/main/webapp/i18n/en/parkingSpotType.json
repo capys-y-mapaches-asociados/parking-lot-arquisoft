@@ -4,9 +4,7 @@
       "null": "",
       "REGULAR": "REGULAR",
       "HANDICAPPED": "HANDICAPPED",
-      "MATERNITY": "MATERNITY",
-      "LOADING": "LOADING",
-      "EMERGENCY": "EMERGENCY"
+      "MATERNITY": "MATERNITY"
     }
   }
 }

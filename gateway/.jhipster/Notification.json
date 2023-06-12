@@ -9,17 +9,13 @@
     {
       "fieldName": "message",
       "fieldType": "String",
-      "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "1000"
+      "fieldValidateRules": ["minlength", "maxlength", "required"],
+      "fieldValidateRulesMaxlength": "1000",
+      "fieldValidateRulesMinlength": "100"
     },
     {
       "fieldName": "sentAt",
       "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "recipientId",
-      "fieldType": "UUID",
       "fieldValidateRules": ["required"]
     }
   ],
