@@ -8,7 +8,7 @@
     "dockerRepositoryName": "zacwastaken",
     "ingressDomain": "",
     "istio": false,
-    "jwtSecretKey": "ZTVmODFmMGMwZmJlYTgxY2UxODhlMWFjZjY3MzlhMWQ2YmFlNTJlMmVlNDE2NTA1ZTI0NzI5N2JjMGY1ZDM0MDY2YWM3MmM4M2IxZTE2YjhiNDg3ZjQ0MzVkNjgxZTJkYWY3OQ==",
+    "jwtSecretKey": "NWEzNThhMzkyODlhMzYzMzA1ODE5NmM5MjdmMmZlMTA0NTVlNjJhYzUyNDg4ZmVhYzA4OWIxZjgxNTc5YjE4NmFmMjgyMDEzMGU2ZTU5NzdhNmVmNmY4ZTBiODUyOGViNzk0ZA==",
     "kubernetesNamespace": "default",
     "kubernetesServiceType": "LoadBalancer",
     "kubernetesStorageClassName": "",

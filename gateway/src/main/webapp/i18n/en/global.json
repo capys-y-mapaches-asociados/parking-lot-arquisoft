@@ -8,12 +8,12 @@
       "entities": {
         "main": "Entities",
         "barrier": "Barrier",
-        "parkingLot": "Parking Lot",
-        "payment": "Payment",
-        "parkingSpot": "Parking Spot",
-        "reservation": "Reservation",
-        "notification": "Notification",
         "customer": "Customer",
+        "notification": "Notification",
+        "parkingLot": "Parking Lot",
+        "parkingSpot": "Parking Spot",
+        "payment": "Payment",
+        "reservation": "Reservation",
         "ticket": "Ticket",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },

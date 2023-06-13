@@ -17,7 +17,7 @@ describe('Notification e2e test', () => {
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
   const notificationSample = {
     message: 'mint ivoryXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    sentAt: '2023-06-12T18:59:56.623Z',
+    sentAt: '2023-06-12T21:51:45.623Z',
   };
 
   let notification;
@@ -34,10 +34,10 @@ describe('Notification e2e test', () => {
       url: '/api/reservations',
       body: {
         ticketId: 923,
-        startTime: '2023-06-12T14:58:33.489Z',
-        endTime: '2023-06-12T10:22:22.444Z',
+        startTime: '2023-06-12T17:55:22.489Z',
+        endTime: '2023-06-12T13:19:11.444Z',
         status: 'ACTIVE',
-        reservationCode: 'BA-8{10, 14}',
+        reservationCode: 'BA-a5CEC14CfBEFcF',
       },
     }).then(({ body }) => {
       reservation = body;
@@ -204,7 +204,7 @@ describe('Notification e2e test', () => {
         .type('Buckinghamshire Gorgeous indexingXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
         .should('have.value', 'Buckinghamshire Gorgeous indexingXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 
-      cy.get(`[data-cy="sentAt"]`).type('2023-06-12T03:39').blur().should('have.value', '2023-06-12T03:39');
+      cy.get(`[data-cy="sentAt"]`).type('2023-06-12T06:31').blur().should('have.value', '2023-06-12T06:31');
 
       cy.get(`[data-cy="reservationId"]`).select([0]);
 

@@ -46,8 +46,8 @@ class ReservationResourceIT {
     private static final ReservationStatus DEFAULT_STATUS = ReservationStatus.PLACED;
     private static final ReservationStatus UPDATED_STATUS = ReservationStatus.ACTIVE;
 
-    private static final String DEFAULT_RESERVATION_CODE = "AY-a{10, 14}";
-    private static final String UPDATED_RESERVATION_CODE = "PP-8{10, 14}";
+    private static final String DEFAULT_RESERVATION_CODE = "AY-11085e2bcC9";
+    private static final String UPDATED_RESERVATION_CODE = "PC-C4052FbEe9";
 
     private static final String ENTITY_API_URL = "/api/reservations";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -411,7 +411,7 @@ class ReservationResourceIT {
         Reservation partialUpdatedReservation = new Reservation();
         partialUpdatedReservation.setId(reservation.getId());
 
-        partialUpdatedReservation.ticketId(UPDATED_TICKET_ID).endTime(UPDATED_END_TIME);
+        partialUpdatedReservation.startTime(UPDATED_START_TIME).status(UPDATED_STATUS).reservationCode(UPDATED_RESERVATION_CODE);
 
         restReservationMockMvc
             .perform(
@@ -425,11 +425,11 @@ class ReservationResourceIT {
         List<Reservation> reservationList = reservationRepository.findAll();
         assertThat(reservationList).hasSize(databaseSizeBeforeUpdate);
         Reservation testReservation = reservationList.get(reservationList.size() - 1);
-        assertThat(testReservation.getTicketId()).isEqualTo(UPDATED_TICKET_ID);
-        assertThat(testReservation.getStartTime()).isEqualTo(DEFAULT_START_TIME);
-        assertThat(testReservation.getEndTime()).isEqualTo(UPDATED_END_TIME);
-        assertThat(testReservation.getStatus()).isEqualTo(DEFAULT_STATUS);
-        assertThat(testReservation.getReservationCode()).isEqualTo(DEFAULT_RESERVATION_CODE);
+        assertThat(testReservation.getTicketId()).isEqualTo(DEFAULT_TICKET_ID);
+        assertThat(testReservation.getStartTime()).isEqualTo(UPDATED_START_TIME);
+        assertThat(testReservation.getEndTime()).isEqualTo(DEFAULT_END_TIME);
+        assertThat(testReservation.getStatus()).isEqualTo(UPDATED_STATUS);
+        assertThat(testReservation.getReservationCode()).isEqualTo(UPDATED_RESERVATION_CODE);
     }
 
     @Test

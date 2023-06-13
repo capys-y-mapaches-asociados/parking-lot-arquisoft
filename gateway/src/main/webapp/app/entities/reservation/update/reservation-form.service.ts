@@ -71,7 +71,7 @@ export class ReservationFormService {
         validators: [Validators.required],
       }),
       reservationCode: new FormControl(reservationRawValue.reservationCode, {
-        validators: [Validators.required, Validators.pattern('^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$')],
+        validators: [Validators.required, Validators.pattern('^([A-Z]{2})-([A-Fa-f0-9]{10,14})$')],
       }),
       customerId: new FormControl(reservationRawValue.customerId),
       notifications: new FormControl(reservationRawValue.notifications),

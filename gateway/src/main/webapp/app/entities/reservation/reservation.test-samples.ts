@@ -7,36 +7,36 @@ import { IReservation, NewReservation } from './reservation.model';
 export const sampleWithRequiredData: IReservation = {
   id: 52422,
   ticketId: 25554,
-  startTime: dayjs('2023-06-12T17:04'),
-  endTime: dayjs('2023-06-12T04:07'),
+  startTime: dayjs('2023-06-12T20:01'),
+  endTime: dayjs('2023-06-12T07:04'),
   status: ReservationStatus['CANCELLED'],
-  reservationCode: 'WQ-E{10, 14}',
+  reservationCode: 'WQ-1d3Dfa6a8d1',
 };
 
 export const sampleWithPartialData: IReservation = {
-  id: 60561,
-  ticketId: 44488,
-  startTime: dayjs('2023-06-12T05:51'),
-  endTime: dayjs('2023-06-12T19:05'),
-  status: ReservationStatus['EXPIRED'],
-  reservationCode: 'VH-8{10, 14}',
+  id: 41013,
+  ticketId: 9563,
+  startTime: dayjs('2023-06-12T18:19'),
+  endTime: dayjs('2023-06-12T18:27'),
+  status: ReservationStatus['CANCELLED'],
+  reservationCode: 'ET-b6d64FC18ce433',
 };
 
 export const sampleWithFullData: IReservation = {
-  id: 42928,
-  ticketId: 60593,
-  startTime: dayjs('2023-06-12T12:57'),
-  endTime: dayjs('2023-06-12T20:30'),
+  id: 19641,
+  ticketId: 90285,
+  startTime: dayjs('2023-06-12T07:15'),
+  endTime: dayjs('2023-06-12T02:28'),
   status: ReservationStatus['ACTIVE'],
-  reservationCode: 'US-E{10, 14}',
+  reservationCode: 'AG-F4491CB1f1f4C',
 };
 
 export const sampleWithNewData: NewReservation = {
-  ticketId: 76094,
-  startTime: dayjs('2023-06-12T03:21'),
-  endTime: dayjs('2023-06-12T15:00'),
-  status: ReservationStatus['CANCELLED'],
-  reservationCode: 'VT-F{10, 14}',
+  ticketId: 65199,
+  startTime: dayjs('2023-06-12T22:36'),
+  endTime: dayjs('2023-06-13T01:14'),
+  status: ReservationStatus['ACTIVE'],
+  reservationCode: 'PN-8A6EDEb8d1f21',
   id: null,
 };
 

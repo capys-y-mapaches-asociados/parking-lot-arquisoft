@@ -1,6 +1,6 @@
 {
   "applications": ["gateway", "reservations"],
-  "changelogDate": "20230612224817",
+  "changelogDate": "20230613014506",
   "databaseType": "sql",
   "dto": "mapstruct",
   "embedded": false,
@@ -31,7 +31,7 @@
       "fieldName": "reservationCode",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique", "pattern"],
-      "fieldValidateRulesPattern": "^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$"
+      "fieldValidateRulesPattern": "^([A-Z]{2})-([A-Fa-f0-9]{10,14})$"
     }
   ],
   "fluentMethods": true,

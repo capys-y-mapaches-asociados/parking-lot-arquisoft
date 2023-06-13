@@ -35,8 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class TicketResourceIT {
 
-    private static final String DEFAULT_TICKET_CODE = "1{6, 10}";
-    private static final String UPDATED_TICKET_CODE = "1{6, 10}B";
+    private static final String DEFAULT_TICKET_CODE = "AAAAAAAAAA";
+    private static final String UPDATED_TICKET_CODE = "BBBBBBBBBB";
 
     private static final Instant DEFAULT_ISSUED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_ISSUED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -418,7 +418,7 @@ class TicketResourceIT {
         Ticket partialUpdatedTicket = new Ticket();
         partialUpdatedTicket.setId(ticket.getId());
 
-        partialUpdatedTicket.ticketCode(UPDATED_TICKET_CODE);
+        partialUpdatedTicket.entryTime(UPDATED_ENTRY_TIME);
 
         restTicketMockMvc
             .perform(
@@ -432,9 +432,9 @@ class TicketResourceIT {
         List<Ticket> ticketList = ticketRepository.findAll();
         assertThat(ticketList).hasSize(databaseSizeBeforeUpdate);
         Ticket testTicket = ticketList.get(ticketList.size() - 1);
-        assertThat(testTicket.getTicketCode()).isEqualTo(UPDATED_TICKET_CODE);
+        assertThat(testTicket.getTicketCode()).isEqualTo(DEFAULT_TICKET_CODE);
         assertThat(testTicket.getIssuedAt()).isEqualTo(DEFAULT_ISSUED_AT);
-        assertThat(testTicket.getEntryTime()).isEqualTo(DEFAULT_ENTRY_TIME);
+        assertThat(testTicket.getEntryTime()).isEqualTo(UPDATED_ENTRY_TIME);
         assertThat(testTicket.getExitTime()).isEqualTo(DEFAULT_EXIT_TIME);
         assertThat(testTicket.getStatus()).isEqualTo(DEFAULT_STATUS);
     }

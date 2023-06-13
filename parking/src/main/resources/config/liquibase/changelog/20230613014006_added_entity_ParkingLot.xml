@@ -9,9 +9,9 @@
     <!--
         Added the entity ParkingLot.
     -->
-    <changeSet id="20230612224517-1" author="jhipster">
+    <changeSet id="20230613014006-1" author="jhipster">
         <createTable tableName="parking_lot">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
@@ -37,7 +37,7 @@
           This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
           Spring Boot configuration key.
     -->
-    <changeSet id="20230612224517-1-data" author="jhipster" context="faker">
+    <changeSet id="20230613014006-1-data" author="jhipster" context="faker">
         <loadData
                   file="config/liquibase/fake-data/parking_lot.csv"
                   separator=";"

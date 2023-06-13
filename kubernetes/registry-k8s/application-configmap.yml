@@ -24,7 +24,7 @@ data:
       security:
         authentication:
           jwt:
-            base64-secret: ZTVmODFmMGMwZmJlYTgxY2UxODhlMWFjZjY3MzlhMWQ2YmFlNTJlMmVlNDE2NTA1ZTI0NzI5N2JjMGY1ZDM0MDY2YWM3MmM4M2IxZTE2YjhiNDg3ZjQ0MzVkNjgxZTJkYWY3OQ==
+            base64-secret: NWEzNThhMzkyODlhMzYzMzA1ODE5NmM5MjdmMmZlMTA0NTVlNjJhYzUyNDg4ZmVhYzA4OWIxZjgxNTc5YjE4NmFmMjgyMDEzMGU2ZTU5NzdhNmVmNmY4ZTBiODUyOGViNzk0ZA==
   # app specific configuration
   jhipster-registry.yml: |-
     eureka:

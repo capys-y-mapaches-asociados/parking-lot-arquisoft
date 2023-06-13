@@ -27,7 +27,7 @@ public class ReservationDTO implements Serializable {
     private ReservationStatus status;
 
     @NotNull(message = "must not be null")
-    @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$")
+    @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10,14})$")
     private String reservationCode;
 
     private CustomerDTO customerId;

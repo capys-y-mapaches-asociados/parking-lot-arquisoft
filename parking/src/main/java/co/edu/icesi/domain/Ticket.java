@@ -27,7 +27,7 @@ public class Ticket implements Serializable {
     private Long id;
 
     @NotNull
-    @Pattern(regexp = "^[A-F0-9]{6, 10}$")
+    @Pattern(regexp = "^[A-F0-9]{6,10}$")
     @Column(name = "ticket_code", nullable = false, unique = true)
     private String ticketCode;
 

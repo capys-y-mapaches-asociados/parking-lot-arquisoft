@@ -117,7 +117,7 @@ entity Reservation {
   startTime Instant required, 
   endTime Instant required, 
   status ReservationStatus required, 
-  reservationCode String required unique pattern (/^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$/)
+  reservationCode String required unique pattern (/^([A-Z]{2})-([A-Fa-f0-9]{10,14})$/)
 }
 
 entity Customer {
@@ -150,7 +150,7 @@ enum BarrierStatus {
 }
 
 entity Ticket {
-  ticketCode String required unique pattern(/^[A-F0-9]{6, 10}$/), 
+  ticketCode String required unique pattern(/^[A-F0-9]{6,10}$/), 
   issuedAt Instant required, 
   entryTime Instant required, 
   exitTime Instant required, 

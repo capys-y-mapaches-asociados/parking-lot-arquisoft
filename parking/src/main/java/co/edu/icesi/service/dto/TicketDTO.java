@@ -15,7 +15,7 @@ public class TicketDTO implements Serializable {
     private Long id;
 
     @NotNull
-    @Pattern(regexp = "^[A-F0-9]{6, 10}$")
+    @Pattern(regexp = "^[A-F0-9]{6,10}$")
     private String ticketCode;
 
     @NotNull

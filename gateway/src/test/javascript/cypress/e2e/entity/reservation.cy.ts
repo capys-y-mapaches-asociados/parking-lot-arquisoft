@@ -16,11 +16,11 @@ describe('Reservation e2e test', () => {
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
   const reservationSample = {
-    ticketId: 39118,
-    startTime: '2023-06-12T11:20:39.837Z',
-    endTime: '2023-06-12T02:52:27.933Z',
+    ticketId: 154,
+    startTime: '2023-06-12T20:40:19.824Z',
+    endTime: '2023-06-13T00:38:29.429Z',
     status: 'EXPIRED',
-    reservationCode: 'IV-F{10, 14}',
+    reservationCode: 'UP-28b304f9005c',
   };
 
   let reservation;
@@ -165,13 +165,13 @@ describe('Reservation e2e test', () => {
     it('should create an instance of Reservation', () => {
       cy.get(`[data-cy="ticketId"]`).type('80028').should('have.value', '80028');
 
-      cy.get(`[data-cy="startTime"]`).type('2023-06-12T20:27').blur().should('have.value', '2023-06-12T20:27');
+      cy.get(`[data-cy="startTime"]`).type('2023-06-12T23:24').blur().should('have.value', '2023-06-12T23:24');
 
-      cy.get(`[data-cy="endTime"]`).type('2023-06-12T06:01').blur().should('have.value', '2023-06-12T06:01');
+      cy.get(`[data-cy="endTime"]`).type('2023-06-12T08:58').blur().should('have.value', '2023-06-12T08:58');
 
       cy.get(`[data-cy="status"]`).select('CANCELLED');
 
-      cy.get(`[data-cy="reservationCode"]`).type('IE-e{10, 14}').should('have.value', 'IE-e{10, 14}');
+      cy.get(`[data-cy="reservationCode"]`).type('IE-ce63Da6F4aEd').should('have.value', 'IE-ce63Da6F4aEd');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

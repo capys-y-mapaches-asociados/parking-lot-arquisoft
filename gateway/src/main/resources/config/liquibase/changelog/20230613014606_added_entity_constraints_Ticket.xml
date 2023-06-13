@@ -4,14 +4,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
     <!--
-        Added the constraints for entity ParkingSpot.
+        Added the constraints for entity Ticket.
     -->
-    <changeSet id="20230612224617-2" author="jhipster">
+    <changeSet id="20230613014606-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="parking_lot_id_id"
-                                 baseTableName="parking_spot"
-                                 constraintName="fk_parking_spot__parking_lot_id_id"
+        <addForeignKeyConstraint baseColumnNames="parking_spot_id_id"
+                                 baseTableName="ticket"
+                                 constraintName="fk_ticket__parking_spot_id_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="parking_lot"/>
+                                 referencedTableName="parking_spot"/>
     </changeSet>
 </databaseChangeLog>

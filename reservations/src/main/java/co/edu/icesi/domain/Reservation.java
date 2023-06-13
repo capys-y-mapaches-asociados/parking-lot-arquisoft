@@ -44,7 +44,7 @@ public class Reservation implements Serializable {
     private ReservationStatus status;
 
     @NotNull
-    @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10, 14})$")
+    @Pattern(regexp = "^([A-Z]{2})-([A-Fa-f0-9]{10,14})$")
     @Column(name = "reservation_code", nullable = false, unique = true)
     private String reservationCode;
 

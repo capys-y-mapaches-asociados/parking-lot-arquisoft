@@ -1,6 +1,6 @@
 {
   "applications": ["gateway", "parking"],
-  "changelogDate": "20230612224517",
+  "changelogDate": "20230613014206",
   "databaseType": "sql",
   "dto": "mapstruct",
   "embedded": false,

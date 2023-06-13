@@ -1,6 +1,6 @@
 {
   "applications": ["gateway", "payments"],
-  "changelogDate": "20230612224417",
+  "changelogDate": "20230613013906",
   "clientRootFolder": "payments",
   "databaseType": "sql",
   "dto": "mapstruct",

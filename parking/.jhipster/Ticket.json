@@ -1,6 +1,6 @@
 {
   "applications": ["gateway", "parking"],
-  "changelogDate": "20230612224717",
+  "changelogDate": "20230613014206",
   "clientRootFolder": "parking",
   "databaseType": "sql",
   "dto": "mapstruct",
@@ -11,7 +11,7 @@
       "fieldName": "ticketCode",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique", "pattern"],
-      "fieldValidateRulesPattern": "^[A-F0-9]{6, 10}$"
+      "fieldValidateRulesPattern": "^[A-F0-9]{6,10}$"
     },
     {
       "fieldName": "issuedAt",

@@ -6,37 +6,37 @@ import { ITicket, NewTicket } from './ticket.model';
 
 export const sampleWithRequiredData: ITicket = {
   id: 65582,
-  ticketCode: '6{6, 10}',
-  issuedAt: dayjs('2023-06-12T20:41'),
-  entryTime: dayjs('2023-06-12T11:24'),
-  exitTime: dayjs('2023-06-12T00:24'),
+  ticketCode: 'B18DBAAB6',
+  issuedAt: dayjs('2023-06-12T08:09'),
+  entryTime: dayjs('2023-06-12T03:01'),
+  exitTime: dayjs('2023-06-12T14:13'),
   status: TicketStatus['ACTIVE'],
 };
 
 export const sampleWithPartialData: ITicket = {
-  id: 7730,
-  ticketCode: 'A{6, 10}',
-  issuedAt: dayjs('2023-06-12T21:49'),
-  entryTime: dayjs('2023-06-12T20:28'),
-  exitTime: dayjs('2023-06-12T04:16'),
-  status: TicketStatus['EXPIRED'],
+  id: 57248,
+  ticketCode: '4ADE668E',
+  issuedAt: dayjs('2023-06-12T09:30'),
+  entryTime: dayjs('2023-06-13T01:28'),
+  exitTime: dayjs('2023-06-13T01:09'),
+  status: TicketStatus['ACTIVE'],
 };
 
 export const sampleWithFullData: ITicket = {
-  id: 94764,
-  ticketCode: '1{6, 10}',
-  issuedAt: dayjs('2023-06-12T19:31'),
-  entryTime: dayjs('2023-06-12T09:06'),
-  exitTime: dayjs('2023-06-12T09:47'),
+  id: 3134,
+  ticketCode: '862729A7D2',
+  issuedAt: dayjs('2023-06-12T02:36'),
+  entryTime: dayjs('2023-06-12T23:16'),
+  exitTime: dayjs('2023-06-12T22:23'),
   status: TicketStatus['EXPIRED'],
 };
 
 export const sampleWithNewData: NewTicket = {
-  ticketCode: 'D{6, 10}',
-  issuedAt: dayjs('2023-06-12T16:44'),
-  entryTime: dayjs('2023-06-12T04:33'),
-  exitTime: dayjs('2023-06-12T03:22'),
-  status: TicketStatus['EXPIRED'],
+  ticketCode: '7CF75FA2F8',
+  issuedAt: dayjs('2023-06-12T14:12'),
+  entryTime: dayjs('2023-06-13T00:44'),
+  exitTime: dayjs('2023-06-12T15:08'),
+  status: TicketStatus['ACTIVE'],
   id: null,
 };
 

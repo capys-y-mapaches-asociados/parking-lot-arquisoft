@@ -5,24 +5,9 @@ export const EntityNavbarItems = [
     translationKey: 'global.menu.entities.barrier',
   },
   {
-    name: 'ParkingLot',
-    route: 'parking-lot',
-    translationKey: 'global.menu.entities.parkingLot',
-  },
-  {
-    name: 'Payment',
-    route: 'payment',
-    translationKey: 'global.menu.entities.payment',
-  },
-  {
-    name: 'ParkingSpot',
-    route: 'parking-spot',
-    translationKey: 'global.menu.entities.parkingSpot',
-  },
-  {
-    name: 'Reservation',
-    route: 'reservation',
-    translationKey: 'global.menu.entities.reservation',
+    name: 'Customer',
+    route: 'customer',
+    translationKey: 'global.menu.entities.customer',
   },
   {
     name: 'Notification',
@@ -30,9 +15,24 @@ export const EntityNavbarItems = [
     translationKey: 'global.menu.entities.notification',
   },
   {
-    name: 'Customer',
-    route: 'customer',
-    translationKey: 'global.menu.entities.customer',
+    name: 'ParkingLot',
+    route: 'parking-lot',
+    translationKey: 'global.menu.entities.parkingLot',
+  },
+  {
+    name: 'ParkingSpot',
+    route: 'parking-spot',
+    translationKey: 'global.menu.entities.parkingSpot',
+  },
+  {
+    name: 'Payment',
+    route: 'payment',
+    translationKey: 'global.menu.entities.payment',
+  },
+  {
+    name: 'Reservation',
+    route: 'reservation',
+    translationKey: 'global.menu.entities.reservation',
   },
   {
     name: 'Ticket',

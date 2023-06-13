@@ -59,7 +59,7 @@ export class TicketFormService {
         }
       ),
       ticketCode: new FormControl(ticketRawValue.ticketCode, {
-        validators: [Validators.required, Validators.pattern('^[A-F0-9]{6, 10}$')],
+        validators: [Validators.required, Validators.pattern('^[A-F0-9]{6,10}$')],
       }),
       issuedAt: new FormControl(ticketRawValue.issuedAt, {
         validators: [Validators.required],

@@ -15,7 +15,7 @@ describe('Ticket e2e test', () => {
   const ticketPageUrlPattern = new RegExp('/ticket(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  // const ticketSample = {"ticketCode":"4{6, 10}","issuedAt":"2023-06-12T00:21:42.937Z","entryTime":"2023-06-12T10:35:02.559Z","exitTime":"2023-06-12T15:37:26.017Z","status":"EXPIRED"};
+  // const ticketSample = {"ticketCode":"7FCCC8","issuedAt":"2023-06-12T23:44:18.631Z","entryTime":"2023-06-12T06:43:39.722Z","exitTime":"2023-06-12T08:18:19.803Z","status":"ACTIVE"};
 
   let ticket;
   // let parkingSpot;
@@ -210,15 +210,15 @@ describe('Ticket e2e test', () => {
     });
 
     it.skip('should create an instance of Ticket', () => {
-      cy.get(`[data-cy="ticketCode"]`).type('7{6, 10}').should('have.value', '7{6, 10}');
+      cy.get(`[data-cy="ticketCode"]`).type('D72C482E7D').should('have.value', 'D72C482E7D');
 
-      cy.get(`[data-cy="issuedAt"]`).type('2023-06-12T17:16').blur().should('have.value', '2023-06-12T17:16');
+      cy.get(`[data-cy="issuedAt"]`).type('2023-06-12T02:20').blur().should('have.value', '2023-06-12T02:20');
 
-      cy.get(`[data-cy="entryTime"]`).type('2023-06-12T03:03').blur().should('have.value', '2023-06-12T03:03');
+      cy.get(`[data-cy="entryTime"]`).type('2023-06-12T02:52').blur().should('have.value', '2023-06-12T02:52');
 
-      cy.get(`[data-cy="exitTime"]`).type('2023-06-12T10:11').blur().should('have.value', '2023-06-12T10:11');
+      cy.get(`[data-cy="exitTime"]`).type('2023-06-12T02:32').blur().should('have.value', '2023-06-12T02:32');
 
-      cy.get(`[data-cy="status"]`).select('ACTIVE');
+      cy.get(`[data-cy="status"]`).select('EXPIRED');
 
       cy.get(`[data-cy="parkingSpotId"]`).select(1);
 
